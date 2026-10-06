@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Current project status and decisions
+
+- The project is named SkyScoop and registers the Lovelace type `custom:skyscoop-card`.
+- The minimum Home Assistant target is 2026.9.1. Initial distribution is planned through a custom HACS frontend repository.
+- The first implementation slice is the standalone Lit card lifecycle, station-temperature display, starter configuration, basic visual editor, and automated DOM tests. Forecast, rainfall, responsive layout tiers, and broader localization remain future work unless implemented and verified.
+- No live Home Assistant dashboard has been used for validation yet; do not describe the card as integration-tested.
+- Prefer actual forecast period timestamps for high/low selection. When unavailable, use 17:00 in Home Assistant local time as the documented first-release fallback; do not add a configuration option for it initially.
+
 ## Project purpose
 
 This repository contains a Home Assistant Lovelace custom card for weather-station observations and forecast data. The card is intended to feel at home beside Mushroom cards while remaining a standalone project.
@@ -54,7 +62,7 @@ Handle missing, unavailable, unknown, and invalid entity states gracefully. An o
 
 ## Configuration principles
 
-- Use clear, stable configuration names.
+- Use clear, stable configuration names. The current Lovelace type is `custom:skyscoop-card`.
 - Provide sensible defaults and an automatic mode for responsive behavior.
 - Prefer entity selectors and structured editor controls over free-form text fields.
 - Keep advanced options available in YAML without making them mandatory for ordinary users.
