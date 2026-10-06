@@ -4,6 +4,11 @@ const messages = {
     unavailable: "Unavailable",
     chooseTemperature: "Choose a temperature entity in the card configuration.",
     temperatureEntity: "Temperature entity",
+    forecastHigh: "Today's forecast high",
+    forecastLow: "Tonight's forecast low",
+    forecastSummary: "Forecast summary",
+    forecastUnavailable: "Forecast unavailable",
+    weatherEntity: "Weather entity",
   },
 } as const;
 

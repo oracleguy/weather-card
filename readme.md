@@ -21,11 +21,11 @@ This project is designed for Ecowitt-style weather stations and weather integrat
 
 ## Planned information hierarchy
 
-The card will use three main areas:
+The planned card will use three main areas:
 
-1. Current conditions from the weather station: temperature, condition, feels-like temperature, and selected station metrics.
-2. Near-term forecast from the configured weather entity: hourly forecast, precipitation probability, and a dynamic high/low summary.
-3. Rainfall context from station sensors: current rain rate, rainfall today, rainfall this week, and a recent-history sparkline.
+1. Current conditions from the weather station. The current implementation displays its configured temperature; other station metrics are planned.
+2. Forecast information from the configured weather entity. The current implementation displays a dynamic high/low summary; hourly forecast and precipitation probability are planned.
+3. Rainfall context from station sensors, including rainfall totals and a recent-history sparkline. This area is planned.
 
 Additional Ecowitt values may include humidity, dew point, pressure, wind direction and speed, wind gusts, UV index, solar lux, and other available measurements. The card should prioritize these adaptively instead of displaying every value at once.
 
@@ -52,9 +52,10 @@ npm install
 npm test
 npm run typecheck
 npm run build
+npm run test:browser
 ```
 
-The build writes the browser bundle to `dist/skyscoop-card.js`. The project currently uses a DOM test environment with a mocked Home Assistant object; it has not yet been validated in a live Home Assistant dashboard.
+The build writes the browser bundle to `dist/skyscoop-card.js`. Unit and DOM tests use a mocked Home Assistant object. Browser tests verify registration, station temperature, forecast subscription/rendering, and visual-editor events using a local fixture. The card has not been validated in a live Home Assistant dashboard.
 
 For browser-level checks of the built bundle, install Playwright's Chromium browser once and run:
 
@@ -63,11 +64,11 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-These tests use a local fixture and do not require a Home Assistant instance. They verify browser registration, temperature rendering, and visual-editor events, but do not replace a live Home Assistant integration check.
+These tests use a local fixture and do not require a Home Assistant instance. They do not replace a live Home Assistant integration check.
 
 ## Example configuration
 
-The first implementation displays the configured station temperature. The weather entity and other station measurements are reserved for later increments.
+The card displays the configured station temperature and, when configured, a forecast high/low summary from a weather entity that advertises daily or twice-daily forecast support.
 
 ```yaml
 type: custom:skyscoop-card
@@ -75,23 +76,24 @@ temperature_entity: sensor.outdoor_temperature
 weather_entity: weather.home
 ```
 
-`temperature_entity` should refer to a temperature sensor. If it is omitted or unavailable, the card displays a setup or unavailable state instead of failing. Entity IDs are user-configured; SkyScoop does not assume Ecowitt-specific names.
+`temperature_entity` should refer to a temperature sensor. `weather_entity` should refer to a weather entity with supported forecast data. If the station sensor is omitted or unavailable, the card displays a setup or unavailable state; if forecast data is missing, unsupported, or unavailable, it displays an unavailable forecast summary without suppressing the station reading. Entity IDs are user-configured; SkyScoop does not assume Ecowitt-specific names.
 
 ## Localization
 
-All user-facing strings should be translatable. This includes labels, forecast summaries, rainfall states, accessibility text, and compass directions.
+The current interface strings are English-only. Numeric values are formatted with `Intl.NumberFormat` using Home Assistant's language, and forecast units use the weather entity's temperature unit. Broader translation support and comprehensive Home Assistant unit-preference handling remain planned.
 
-Wind direction is stored as degrees and converted at display time. The card should support both 8-point and 16-point compass modes and use locale-appropriate direction labels rather than hardcoded English abbreviations.
+Wind direction is not implemented yet. When added, it should be stored as degrees and converted at display time, with locale-appropriate direction labels.
 
 ## Roadmap
 
 - [x] Create the initial TypeScript/Lit and HACS scaffold
-- [x] Implement the basic card lifecycle, temperature display, starter config, and entity picker editor
+- [x] Implement the basic card lifecycle, temperature display, starter config, and visual editor
+- [x] Add forecast high/low summary with timestamp-based selection and a 17:00 local-time fallback
+- [x] Add forecast subscription, weather entity picker, and automated tests
 - [ ] Verify the card in a live Home Assistant dashboard
 - [ ] Add weather-station current conditions
-- [ ] Add forecast rendering
+- [ ] Add hourly forecast rendering
 - [ ] Add responsive compact, standard, and wide layouts
-- [ ] Add dynamic time-of-day high/low behavior
 - [ ] Add rainfall totals and a 24-hour sparkline
 - [ ] Add adaptive metric prioritization
 - [ ] Add compass-direction conversion
@@ -100,7 +102,7 @@ Wind direction is stored as degrees and converted at display time. The card shou
 
 ## Status
 
-Early implementation. The current slice is a buildable standalone card with a station-temperature display, starter configuration, a basic visual editor, and DOM tests. Forecast selection and the rainfall, responsive, localization, and expanded metric features remain planned.
+Early implementation. The current slice is a buildable standalone Lit card with a station-temperature display, a separate forecast high/low summary, starter configuration, a visual editor for both entities, and unit, DOM, and browser tests. The layout is fixed and the UI strings are English-only. Rainfall, hourly forecasts, responsive tiers, expanded metrics, and broader localization remain planned. No live Home Assistant dashboard has been used for validation.
 
 ### Current decisions
 
@@ -108,6 +110,7 @@ Early implementation. The current slice is a buildable standalone card with a st
 - Minimum target: Home Assistant 2026.9.1.
 - Initial distribution: custom HACS repository.
 - Implementation: standalone Lit web component; no Mushroom imports or runtime dependency.
-- Observations come from user-mapped station entities; forecast data will come from the configured weather entity.
-- For high/low selection, use forecast period timestamps when available. If they are unavailable, use 17:00 in Home Assistant local time as the evening switch; this fallback will not be configurable in the first release.
-- Automated DOM tests are available. Live Home Assistant validation is pending.
+- Observations come from the configured station temperature entity; forecast data comes separately from the configured weather entity.
+- The card subscribes to Home Assistant forecast data using `weather/subscribe_forecast`, preferring twice-daily data when advertised and otherwise using daily data. For timestamped day/night periods, the nighttime period timestamp controls the switch. For daily data without a usable day/night boundary, the fallback is 17:00 in Home Assistant local time.
+- Missing, unsupported, or unavailable forecast data does not replace or hide the station temperature.
+- Automated DOM and browser tests cover mocked forecast behavior. Compatibility with a live Home Assistant 2026.9.1 dashboard remains unverified.

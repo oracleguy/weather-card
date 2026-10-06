@@ -1,6 +1,8 @@
 import { LitElement, css, html } from "lit";
+import type { PropertyValues } from "lit";
+import { selectForecastSummary, type ForecastPeriod } from "./forecast.js";
 import { translate } from "./localization.js";
-import type { HassLike, SkyScoopConfig } from "./types.js";
+import type { ForecastSubscriptionEvent, ForecastType, HassLike, SkyScoopConfig } from "./types.js";
 
 export const CARD_TAG = "skyscoop-card";
 
@@ -57,10 +59,55 @@ export class SkyScoopCard extends LitElement {
       color: var(--skyscoop-muted);
       font-size: 1rem;
     }
+
+    .forecast-summary {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 4px;
+      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+    }
+
+    .forecast-value {
+      margin-top: 4px;
+      font-size: 1.125rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
   `;
 
   hass?: HassLike;
   config?: SkyScoopConfig;
+  private forecast?: readonly ForecastPeriod[];
+  private forecastSubscriptionKey?: string;
+  private forecastConnection?: HassLike["connection"];
+  private forecastUnsubscribe?: () => void;
+  private forecastGeneration = 0;
+  private summaryTimer?: ReturnType<typeof setInterval>;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated) {
+      void this.syncForecastSubscription();
+      this.syncSummaryTimer();
+    }
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.clearSummaryTimer();
+    this.stopForecastSubscription();
+  }
+
+  protected updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has("hass") || changedProperties.has("config")) {
+      void this.syncForecastSubscription();
+      this.syncSummaryTimer();
+    }
+  }
 
   setConfig(config: SkyScoopConfig): void {
     if (!config || typeof config !== "object") {
@@ -72,6 +119,101 @@ export class SkyScoopCard extends LitElement {
 
   getCardSize(): number {
     return 2;
+  }
+
+  private getForecastType(): ForecastType | undefined {
+    const weatherEntity = this.config?.weather_entity
+      ? this.hass?.states[this.config.weather_entity]
+      : undefined;
+    const features = Number(weatherEntity?.attributes.supported_features);
+    if (!Number.isFinite(features)) {
+      return undefined;
+    }
+    if ((features & 4) !== 0) {
+      return "twice_daily";
+    }
+    if ((features & 1) !== 0) {
+      return "daily";
+    }
+    return undefined;
+  }
+
+  private async syncForecastSubscription(): Promise<void> {
+    const entityId = this.config?.weather_entity;
+    const entity = entityId ? this.hass?.states[entityId] : undefined;
+    const connection = this.hass?.connection;
+    const forecastType = this.getForecastType();
+    if (
+      !entityId || !entity || entity.state === "unavailable" || entity.state === "unknown" ||
+      !connection || !forecastType
+    ) {
+      this.stopForecastSubscription();
+      return;
+    }
+
+    const key = `${entityId}:${forecastType}`;
+    if (this.forecastSubscriptionKey === key && this.forecastConnection === connection) {
+      return;
+    }
+
+    this.stopForecastSubscription();
+    const generation = this.forecastGeneration;
+    this.forecastSubscriptionKey = key;
+    this.forecastConnection = connection;
+    this.forecast = undefined;
+    this.requestUpdate();
+
+    try {
+      const unsubscribe = await connection.subscribeMessage<ForecastSubscriptionEvent>(
+        (event) => {
+          if (generation !== this.forecastGeneration) {
+            return;
+          }
+          this.forecast = event.forecast ?? undefined;
+          this.requestUpdate();
+        },
+        { type: "weather/subscribe_forecast", forecast_type: forecastType, entity_id: entityId },
+      );
+      if (generation !== this.forecastGeneration) {
+        unsubscribe();
+      } else {
+        this.forecastUnsubscribe = unsubscribe;
+      }
+    } catch {
+      if (generation === this.forecastGeneration) {
+        this.forecast = undefined;
+        this.forecastSubscriptionKey = undefined;
+        this.forecastConnection = undefined;
+        this.requestUpdate();
+      }
+    }
+  }
+
+  private stopForecastSubscription(): void {
+    if (!this.forecastSubscriptionKey && !this.forecastUnsubscribe) {
+      return;
+    }
+    this.forecastGeneration += 1;
+    this.forecastUnsubscribe?.();
+    this.forecastUnsubscribe = undefined;
+    this.forecastSubscriptionKey = undefined;
+    this.forecastConnection = undefined;
+    this.forecast = undefined;
+  }
+
+  private syncSummaryTimer(): void {
+    if (this.isConnected && this.config?.weather_entity && !this.summaryTimer) {
+      this.summaryTimer = setInterval(() => this.requestUpdate(), 60_000);
+    } else if ((!this.isConnected || !this.config?.weather_entity) && this.summaryTimer) {
+      this.clearSummaryTimer();
+    }
+  }
+
+  private clearSummaryTimer(): void {
+    if (this.summaryTimer) {
+      clearInterval(this.summaryTimer);
+      this.summaryTimer = undefined;
+    }
   }
 
   static getStubConfig(hass?: HassLike): SkyScoopConfig {
@@ -99,6 +241,15 @@ export class SkyScoopCard extends LitElement {
     const unit = typeof entity?.attributes.unit_of_measurement === "string"
       ? entity.attributes.unit_of_measurement
       : "";
+    const weatherEntityId = this.config?.weather_entity;
+    const weatherEntity = weatherEntityId ? this.hass?.states[weatherEntityId] : undefined;
+    const timeZone = this.hass?.config?.time_zone
+      ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+      ?? "UTC";
+    const forecastSummary = selectForecastSummary(this.forecast, new Date(), timeZone);
+    const forecastUnit = typeof weatherEntity?.attributes.temperature_unit === "string"
+      ? weatherEntity.attributes.temperature_unit
+      : "";
     const header = this.config?.name || "SkyScoop";
 
     return html`
@@ -117,6 +268,26 @@ export class SkyScoopCard extends LitElement {
                 ${unit ? html`<div class="unit">${unit}</div>` : ""}
               `
             : html`<div class="message">${translate(language, "chooseTemperature")}</div>`}
+          ${weatherEntityId
+            ? html`
+                <div class="forecast-summary">
+                  <div>
+                    <div class="label">
+                      ${translate(language, forecastSummary
+                        ? forecastSummary.kind === "low" ? "forecastLow" : "forecastHigh"
+                        : "forecastSummary")}
+                    </div>
+                    <div class="forecast-value">
+                      ${forecastSummary
+                        ? new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 })
+                          .format(forecastSummary.temperature)
+                        : translate(language, "forecastUnavailable")}
+                    </div>
+                  </div>
+                  ${forecastSummary && forecastUnit ? html`<div class="unit">${forecastUnit}</div>` : ""}
+                </div>
+              `
+            : ""}
         </div>
       </ha-card>
     `;

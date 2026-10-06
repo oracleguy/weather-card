@@ -16,13 +16,20 @@ export class SkyScoopCardEditor extends LitElement {
   }
 
   private onTemperatureChanged(event: Event): void {
-    const value = (event as CustomEvent<{ value?: string }>).detail?.value;
+    this.updateEntity("temperature_entity", (event as CustomEvent<{ value?: string }>).detail?.value);
+  }
+
+  private onWeatherChanged(event: Event): void {
+    this.updateEntity("weather_entity", (event as CustomEvent<{ value?: string }>).detail?.value);
+  }
+
+  private updateEntity(key: "temperature_entity" | "weather_entity", value?: string): void {
     const config = { ...this.config };
 
     if (value) {
-      config.temperature_entity = value;
+      config[key] = value;
     } else {
-      delete config.temperature_entity;
+      delete config[key];
     }
 
     this.config = config;
@@ -40,6 +47,13 @@ export class SkyScoopCardEditor extends LitElement {
         .value=${this.config.temperature_entity ?? ""}
         .label=${translate(this.hass?.language, "temperatureEntity")}
         @value-changed=${this.onTemperatureChanged}
+      ></ha-entity-picker>
+      <ha-entity-picker
+        .hass=${this.hass}
+        .value=${this.config.weather_entity ?? ""}
+        .label=${translate(this.hass?.language, "weatherEntity")}
+        .includeDomains=${["weather"]}
+        @value-changed=${this.onWeatherChanged}
       ></ha-entity-picker>
     `;
   }
