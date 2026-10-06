@@ -56,6 +56,15 @@ npm run build
 
 The build writes the browser bundle to `dist/skyscoop-card.js`. The project currently uses a DOM test environment with a mocked Home Assistant object; it has not yet been validated in a live Home Assistant dashboard.
 
+For browser-level checks of the built bundle, install Playwright's Chromium browser once and run:
+
+```sh
+npx playwright install chromium
+npm run test:browser
+```
+
+These tests use a local fixture and do not require a Home Assistant instance. They verify browser registration, temperature rendering, and visual-editor events, but do not replace a live Home Assistant integration check.
+
 ## Example configuration
 
 The first implementation displays the configured station temperature. The weather entity and other station measurements are reserved for later increments.
