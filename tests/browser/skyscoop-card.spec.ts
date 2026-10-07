@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { mdiWaterPercent, mdiThermometer, mdiThermometerChevronUp, mdiThermometerChevronDown, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWater } from "@mdi/js";
+import { mdiWaterPercent, mdiThermometer, mdiThermometerChevronUp, mdiThermometerChevronDown, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWeatherSunny, mdiWater } from "@mdi/js";
 
 const fixtureIcons = {
   "mdi:water-percent": mdiWaterPercent, "mdi:thermometer": mdiThermometer,
@@ -10,6 +10,7 @@ const fixtureIcons = {
   "mdi:weather-windy": mdiWeatherWindy, "mdi:compass-outline": mdiCompassOutline,
   "mdi:weather-sunny-alert": mdiWeatherSunnyAlert, "mdi:brightness-6": mdiBrightness6,
   "mdi:weather-cloudy": mdiWeatherCloudy, "mdi:weather-rainy": mdiWeatherRainy, "mdi:water": mdiWater,
+  "mdi:weather-sunny": mdiWeatherSunny,
 };
 
 async function mountCompleteCard(page: Page, width: number, language = "en-US") {
@@ -34,7 +35,7 @@ async function mountCompleteCard(page: Page, width: number, language = "en-US") 
         "sensor.direction": { state: "360", attributes: { unit_of_measurement: "°" } },
         "sensor.uv": { state: "0", attributes: {} },
         "sensor.lux": { state: "12400", attributes: { unit_of_measurement: "lx" } },
-        "weather.home": { state: "cloudy", attributes: { supported_features: 3, temperature_unit: "°F" } },
+        "weather.home": { state: "sunny", attributes: { supported_features: 3, temperature_unit: "°F" } },
       },
       connection: {
         subscribeMessage: async (callback: (event: any) => void, message: any) => {

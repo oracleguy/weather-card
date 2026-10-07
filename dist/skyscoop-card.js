@@ -29,11 +29,11 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 	let t = "";
 	for (let n of e.cssRules) t += n.cssText;
 	return a(t);
-})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, g = h.trustedTypes, ee = g ? g.emptyScript : "", te = h.reactiveElementPolyfillSupport, _ = (e, t) => e, v = {
+})(e) : e, { is: l, defineProperty: u, getOwnPropertyDescriptor: d, getOwnPropertyNames: f, getOwnPropertySymbols: p, getPrototypeOf: m } = Object, h = globalThis, g = h.trustedTypes, _ = g ? g.emptyScript : "", v = h.reactiveElementPolyfillSupport, y = (e, t) => e, b = {
 	toAttribute(e, t) {
 		switch (t) {
 			case Boolean:
-				e = e ? ee : null;
+				e = e ? _ : null;
 				break;
 			case Object:
 			case Array: e = e == null ? e : JSON.stringify(e);
@@ -58,23 +58,23 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 		}
 		return n;
 	}
-}, y = (e, t) => !l(e, t), b = {
+}, x = (e, t) => !l(e, t), S = {
 	attribute: !0,
 	type: String,
-	converter: v,
+	converter: b,
 	reflect: !1,
 	useDefault: !1,
-	hasChanged: y
+	hasChanged: x
 };
 Symbol.metadata ??= Symbol("metadata"), h.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-var x = class extends HTMLElement {
+var C = class extends HTMLElement {
 	static addInitializer(e) {
 		this._$Ei(), (this.l ??= []).push(e);
 	}
 	static get observedAttributes() {
 		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
 	}
-	static createProperty(e, t = b) {
+	static createProperty(e, t = S) {
 		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
 			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
 			r !== void 0 && u(this.prototype, e, r);
@@ -100,16 +100,16 @@ var x = class extends HTMLElement {
 		};
 	}
 	static getPropertyOptions(e) {
-		return this.elementProperties.get(e) ?? b;
+		return this.elementProperties.get(e) ?? S;
 	}
 	static _$Ei() {
-		if (this.hasOwnProperty(_("elementProperties"))) return;
+		if (this.hasOwnProperty(y("elementProperties"))) return;
 		let e = m(this);
 		e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
 	}
 	static finalize() {
-		if (this.hasOwnProperty(_("finalized"))) return;
-		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(_("properties"))) {
+		if (this.hasOwnProperty(y("finalized"))) return;
+		if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(y("properties"))) {
 			let e = this.properties, t = [...f(e), ...p(e)];
 			for (let n of t) this.createProperty(n, e[n]);
 		}
@@ -171,14 +171,14 @@ var x = class extends HTMLElement {
 	_$ET(e, t) {
 		let n = this.constructor.elementProperties.get(e), r = this.constructor._$Eu(e, n);
 		if (r !== void 0 && !0 === n.reflect) {
-			let i = (n.converter?.toAttribute === void 0 ? v : n.converter).toAttribute(t, n.type);
+			let i = (n.converter?.toAttribute === void 0 ? b : n.converter).toAttribute(t, n.type);
 			this._$Em = e, i == null ? this.removeAttribute(r) : this.setAttribute(r, i), this._$Em = null;
 		}
 	}
 	_$AK(e, t) {
 		let n = this.constructor, r = n._$Eh.get(e);
 		if (r !== void 0 && this._$Em !== r) {
-			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? v : e.converter;
+			let e = n.getPropertyOptions(r), i = typeof e.converter == "function" ? { fromAttribute: e.converter } : e.converter?.fromAttribute === void 0 ? b : e.converter;
 			this._$Em = r;
 			let a = i.fromAttribute(t, e.type);
 			this[r] = a ?? this._$Ej?.get(r) ?? a, this._$Em = null;
@@ -187,7 +187,7 @@ var x = class extends HTMLElement {
 	requestUpdate(e, t, n, r = !1, i) {
 		if (e !== void 0) {
 			let a = this.constructor;
-			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? y)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? x)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
 			this.C(e, t, n);
 		}
 		!1 === this.isUpdatePending && (this._$ES = this._$EP());
@@ -251,25 +251,25 @@ var x = class extends HTMLElement {
 	updated(e) {}
 	firstUpdated(e) {}
 };
-x.elementStyles = [], x.shadowRootOptions = { mode: "open" }, x[_("elementProperties")] = /* @__PURE__ */ new Map(), x[_("finalized")] = /* @__PURE__ */ new Map(), te?.({ ReactiveElement: x }), (h.reactiveElementVersions ??= []).push("2.1.2");
+C.elementStyles = [], C.shadowRootOptions = { mode: "open" }, C[y("elementProperties")] = /* @__PURE__ */ new Map(), C[y("finalized")] = /* @__PURE__ */ new Map(), v?.({ ReactiveElement: C }), (h.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
-var S = globalThis, ne = (e) => e, C = S.trustedTypes, re = C ? C.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, w = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, E = "?" + T, ie = `<${E}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, N = /-->/g, oe = />/g, P = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), se = /'/g, F = /"/g, I = /^(?:script|style|textarea|title)$/i, L = ((e) => (t, ...n) => ({
+var w = globalThis, T = (e) => e, E = w.trustedTypes, D = E ? E.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ee = "$lit$", O = `lit$${Math.random().toFixed(9).slice(2)}$`, te = "?" + O, ne = `<${te}>`, k = document, A = () => k.createComment(""), j = (e) => e === null || typeof e != "object" && typeof e != "function", M = Array.isArray, re = (e) => M(e) || typeof e?.[Symbol.iterator] == "function", N = "[ 	\n\f\r]", P = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ie = /-->/g, ae = />/g, F = RegExp(`>|${N}(?:([^\\s"'>=/]+)(${N}*=${N}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), oe = /'/g, se = /"/g, I = /^(?:script|style|textarea|title)$/i, L = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
 	values: n
-}))(1), R = Symbol.for("lit-noChange"), z = Symbol.for("lit-nothing"), B = /* @__PURE__ */ new WeakMap(), V = D.createTreeWalker(D, 129);
+}))(1), R = Symbol.for("lit-noChange"), z = Symbol.for("lit-nothing"), B = /* @__PURE__ */ new WeakMap(), V = k.createTreeWalker(k, 129);
 function H(e, t) {
-	if (!A(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-	return re === void 0 ? t : re.createHTML(t);
+	if (!M(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+	return D === void 0 ? t : D.createHTML(t);
 }
 var ce = (e, t) => {
-	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = M;
+	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = P;
 	for (let t = 0; t < n; t++) {
 		let n = e[t], s, c, l = -1, u = 0;
-		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === M ? c[1] === "!--" ? o = N : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = P) : (I.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = P) : o = oe : o === P ? c[0] === ">" ? (o = i ?? M, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? P : c[3] === "\"" ? F : se) : o === F || o === se ? o = P : o === N || o === oe ? o = M : (o = P, i = void 0);
-		let d = o === P && e[t + 1].startsWith("/>") ? " " : "";
-		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + w + n.slice(l) + T + d) : n + T + (l === -2 ? t : d);
+		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === P ? c[1] === "!--" ? o = ie : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = F) : (I.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = F) : o = ae : o === F ? c[0] === ">" ? (o = i ?? P, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? F : c[3] === "\"" ? se : oe) : o === se || o === oe ? o = F : o === ie || o === ae ? o = P : (o = F, i = void 0);
+		let d = o === F && e[t + 1].startsWith("/>") ? " " : "";
+		a += o === P ? n + ne : l >= 0 ? (r.push(s), n.slice(0, l) + ee + n.slice(l) + O + d) : n + O + (l === -2 ? t : d);
 	}
 	return [H(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
 }, U = class e {
@@ -283,8 +283,8 @@ var ce = (e, t) => {
 		}
 		for (; (i = V.nextNode()) !== null && c.length < s;) {
 			if (i.nodeType === 1) {
-				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(w)) {
-					let t = u[o++], n = i.getAttribute(e).split(T), r = /([.?@])?(.*)/.exec(t);
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(ee)) {
+					let t = u[o++], n = i.getAttribute(e).split(O), r = /([.?@])?(.*)/.exec(t);
 					c.push({
 						type: 1,
 						index: a,
@@ -292,45 +292,45 @@ var ce = (e, t) => {
 						strings: n,
 						ctor: r[1] === "." ? ue : r[1] === "?" ? de : r[1] === "@" ? fe : K
 					}), i.removeAttribute(e);
-				} else e.startsWith(T) && (c.push({
+				} else e.startsWith(O) && (c.push({
 					type: 6,
 					index: a
 				}), i.removeAttribute(e));
 				if (I.test(i.tagName)) {
-					let e = i.textContent.split(T), t = e.length - 1;
+					let e = i.textContent.split(O), t = e.length - 1;
 					if (t > 0) {
-						i.textContent = C ? C.emptyScript : "";
-						for (let n = 0; n < t; n++) i.append(e[n], O()), V.nextNode(), c.push({
+						i.textContent = E ? E.emptyScript : "";
+						for (let n = 0; n < t; n++) i.append(e[n], A()), V.nextNode(), c.push({
 							type: 2,
 							index: ++a
 						});
-						i.append(e[t], O());
+						i.append(e[t], A());
 					}
 				}
 			} else if (i.nodeType === 8) {
-				if (i.data === E) c.push({
+				if (i.data === te) c.push({
 					type: 2,
 					index: a
 				});
 				else {
 					let e = -1;
-					for (; (e = i.data.indexOf(T, e + 1)) !== -1;) c.push({
+					for (; (e = i.data.indexOf(O, e + 1)) !== -1;) c.push({
 						type: 7,
 						index: a
-					}), e += T.length - 1;
+					}), e += O.length - 1;
 				}
 			}
 			a++;
 		}
 	}
 	static createElement(e, t) {
-		let n = D.createElement("template");
+		let n = k.createElement("template");
 		return n.innerHTML = e, n;
 	}
 };
 function W(e, t, n = e, r) {
 	if (t === R) return t;
-	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = k(t) ? void 0 : t._$litDirective$;
+	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = j(t) ? void 0 : t._$litDirective$;
 	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = W(e, i._$AS(e, t.values), i, r)), t;
 }
 var le = class {
@@ -344,7 +344,7 @@ var le = class {
 		return this._$AM._$AU;
 	}
 	u(e) {
-		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? D).importNode(t, !0);
+		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? k).importNode(t, !0);
 		V.currentNode = r;
 		let i = V.nextNode(), a = 0, o = 0, s = n[0];
 		for (; s !== void 0;) {
@@ -354,7 +354,7 @@ var le = class {
 			}
 			a !== s?.index && (i = V.nextNode(), a++);
 		}
-		return V.currentNode = D, r;
+		return V.currentNode = k, r;
 	}
 	p(e) {
 		let t = 0;
@@ -378,7 +378,7 @@ var le = class {
 		return this._$AB;
 	}
 	_$AI(e, t = this) {
-		e = W(this, e, t), k(e) ? e === z || e == null || e === "" ? (this._$AH !== z && this._$AR(), this._$AH = z) : e !== this._$AH && e !== R && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? ae(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
+		e = W(this, e, t), j(e) ? e === z || e == null || e === "" ? (this._$AH !== z && this._$AR(), this._$AH = z) : e !== this._$AH && e !== R && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? re(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
 	}
 	O(e) {
 		return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -387,7 +387,7 @@ var le = class {
 		this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
 	}
 	_(e) {
-		this._$AH !== z && k(this._$AH) ? this._$AA.nextSibling.data = e : this.T(D.createTextNode(e)), this._$AH = e;
+		this._$AH !== z && j(this._$AH) ? this._$AA.nextSibling.data = e : this.T(k.createTextNode(e)), this._$AH = e;
 	}
 	$(e) {
 		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = U.createElement(H(n.h, n.h[0]), this.options)), n);
@@ -402,15 +402,15 @@ var le = class {
 		return t === void 0 && B.set(e.strings, t = new U(e)), t;
 	}
 	k(t) {
-		A(this._$AH) || (this._$AH = [], this._$AR());
+		M(this._$AH) || (this._$AH = [], this._$AR());
 		let n = this._$AH, r, i = 0;
-		for (let a of t) i === n.length ? n.push(r = new e(this.O(O()), this.O(O()), this, this.options)) : r = n[i], r._$AI(a), i++;
+		for (let a of t) i === n.length ? n.push(r = new e(this.O(A()), this.O(A()), this, this.options)) : r = n[i], r._$AI(a), i++;
 		i < n.length && (this._$AR(r && r._$AB.nextSibling, i), n.length = i);
 	}
 	_$AR(e = this._$AA.nextSibling, t) {
 		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
-			let t = ne(e).nextSibling;
-			ne(e).remove(), e = t;
+			let t = T(e).nextSibling;
+			T(e).remove(), e = t;
 		}
 	}
 	setConnected(e) {
@@ -428,10 +428,10 @@ var le = class {
 	}
 	_$AI(e, t = this, n, r) {
 		let i = this.strings, a = !1;
-		if (i === void 0) e = W(this, e, t, 0), a = !k(e) || e !== this._$AH && e !== R, a && (this._$AH = e);
+		if (i === void 0) e = W(this, e, t, 0), a = !j(e) || e !== this._$AH && e !== R, a && (this._$AH = e);
 		else {
 			let r = e, o, s;
-			for (e = i[0], o = 0; o < i.length - 1; o++) s = W(this, r[n + o], t, o), s === R && (s = this._$AH[o]), a ||= !k(s) || s !== this._$AH[o], s === z ? e = z : e !== z && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
+			for (e = i[0], o = 0; o < i.length - 1; o++) s = W(this, r[n + o], t, o), s === R && (s = this._$AH[o]), a ||= !j(s) || s !== this._$AH[o], s === z ? e = z : e !== z && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
 		}
 		a && !r && this.j(e);
 	}
@@ -474,16 +474,16 @@ var le = class {
 	_$AI(e) {
 		W(this, e);
 	}
-}, me = S.litHtmlPolyfillSupport;
-me?.(U, G), (S.litHtmlVersions ??= []).push("3.3.3");
+}, me = w.litHtmlPolyfillSupport;
+me?.(U, G), (w.litHtmlVersions ??= []).push("3.3.3");
 var he = (e, t, n) => {
 	let r = n?.renderBefore ?? t, i = r._$litPart$;
 	if (i === void 0) {
 		let e = n?.renderBefore ?? null;
-		r._$litPart$ = i = new G(t.insertBefore(O(), e), e, void 0, n ?? {});
+		r._$litPart$ = i = new G(t.insertBefore(A(), e), e, void 0, n ?? {});
 	}
 	return i._$AI(e), i;
-}, q = globalThis, J = class extends x {
+}, q = globalThis, J = class extends C {
 	constructor() {
 		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
 	}
@@ -510,7 +510,7 @@ var ge = q.litElementPolyfillSupport;
 ge?.({ LitElement: J }), (q.litElementVersions ??= []).push("4.2.2");
 //#endregion
 //#region src/station.ts
-var Y = [
+var _e = [
 	{
 		key: "humidity_entity",
 		label: "humidity",
@@ -561,22 +561,22 @@ var Y = [
 		maximum: Infinity
 	}
 ];
-function X(e) {
+function Y(e) {
 	if (typeof e != "number" && typeof e != "string" || typeof e == "string" && !e.trim()) return;
 	let t = Number(e);
 	return Number.isFinite(t) ? t : void 0;
 }
-function _e(e, t) {
+function ve(e, t) {
 	let n = t ? e?.states[t] : void 0;
 	return {
-		value: X(n?.state),
+		value: Y(n?.state),
 		unit: typeof n?.attributes.unit_of_measurement == "string" ? n.attributes.unit_of_measurement : ""
 	};
 }
-function ve(e, t) {
-	return Y.flatMap((n) => {
+function ye(e, t) {
+	return _e.flatMap((n) => {
 		if (!t?.[n.key]) return [];
-		let r = _e(e, t[n.key]), i = r.value !== void 0 && r.value >= n.minimum && r.value <= n.maximum ? r.value : void 0;
+		let r = ve(e, t[n.key]), i = r.value !== void 0 && r.value >= n.minimum && r.value <= n.maximum ? r.value : void 0;
 		return [{
 			...n,
 			...r,
@@ -586,15 +586,15 @@ function ve(e, t) {
 }
 //#endregion
 //#region src/forecast.ts
-function ye(e, t, n) {
+function be(e, t, n) {
 	let r = t.getTime();
 	if (!Number.isFinite(r) || n <= 0) return [];
 	let i = /* @__PURE__ */ new Map();
 	for (let t of e ?? []) {
 		if (!t || typeof t.datetime != "string") continue;
-		let e = Date.parse(t.datetime), n = X(t.temperature);
+		let e = Date.parse(t.datetime), n = Y(t.temperature);
 		if (!Number.isFinite(e) || e < r || e >= r + 864e5 || n === void 0) continue;
-		let a = X(t.precipitation_probability);
+		let a = Y(t.precipitation_probability);
 		i.has(e) || i.set(e, {
 			timestamp: e,
 			temperature: n,
@@ -604,7 +604,7 @@ function ye(e, t, n) {
 	}
 	return [...i.values()].sort((e, t) => e.timestamp - t.timestamp).slice(0, n);
 }
-function be(e, t) {
+function xe(e, t) {
 	try {
 		let n = new Intl.DateTimeFormat("en-CA", {
 			timeZone: t,
@@ -617,7 +617,7 @@ function be(e, t) {
 		return;
 	}
 }
-function xe(e, t) {
+function Se(e, t) {
 	try {
 		let n = new Intl.DateTimeFormat("en", {
 			timeZone: t,
@@ -629,33 +629,33 @@ function xe(e, t) {
 		return;
 	}
 }
-function Z(e) {
+function X(e) {
 	if (typeof e != "number" && typeof e != "string" || typeof e == "string" && e.trim() === "") return;
 	let t = Number(e);
 	return Number.isFinite(t) ? t : void 0;
 }
-function Se(e, t, n = "UTC") {
+function Ce(e, t, n = "UTC") {
 	if (!e?.length || !Number.isFinite(t.getTime())) return;
-	let r = be(t, n);
+	let r = xe(t, n);
 	if (!r) return;
 	let i = e.flatMap((e) => {
 		if (typeof e.datetime != "string") return [];
 		let t = new Date(e.datetime);
-		return !Number.isFinite(t.getTime()) || be(t, n) !== r ? [] : [{
+		return !Number.isFinite(t.getTime()) || xe(t, n) !== r ? [] : [{
 			period: e,
 			timestamp: t
 		}];
 	});
 	if (!i.length) return;
 	let a = i.find(({ period: e }) => e.is_daytime === !0), o = i.find(({ period: e }) => e.is_daytime === !1), s = o?.timestamp;
-	if (s ? t.getTime() >= s.getTime() : (xe(t, n) ?? 0) >= 17) {
-		let e = Z(o?.period.temperature) ?? Z(a?.period.templow) ?? Z(i[0].period.templow) ?? Z(o?.period.templow);
+	if (s ? t.getTime() >= s.getTime() : (Se(t, n) ?? 0) >= 17) {
+		let e = X(o?.period.temperature) ?? X(a?.period.templow) ?? X(i[0].period.templow) ?? X(o?.period.templow);
 		return e === void 0 ? void 0 : {
 			kind: "low",
 			temperature: e
 		};
 	}
-	let c = Z(a?.period.temperature) ?? Z(i[0].period.temperature);
+	let c = X(a?.period.temperature) ?? X(i[0].period.temperature);
 	return c === void 0 ? void 0 : {
 		kind: "high",
 		temperature: c
@@ -663,7 +663,7 @@ function Se(e, t, n = "UTC") {
 }
 //#endregion
 //#region src/localization.ts
-var Ce = { en: {
+var we = { en: {
 	temperature: "Outdoor temperature",
 	cardHeader: "Card header (optional)",
 	unavailable: "Unavailable",
@@ -722,13 +722,13 @@ var Ce = { en: {
 	forecastUnavailable: "Forecast unavailable",
 	weatherEntity: "Weather entity"
 } };
-function Q(e, t) {
+function Z(e, t) {
 	let n = e?.toLowerCase().split("-")[0];
-	return Ce[n && n in Ce ? n : "en"][t];
+	return we[n && n in we ? n : "en"][t];
 }
 //#endregion
 //#region src/compass.ts
-var we = [
+var Te = [
 	"N",
 	"NNE",
 	"NE",
@@ -746,27 +746,27 @@ var we = [
 	"NW",
 	"NNW"
 ];
-function Te(e) {
+function Ee(e) {
 	return Number.isFinite(e) ? (e % 360 + 360) % 360 : void 0;
 }
-function Ee(e, t = 16) {
-	let n = Te(e);
+function De(e, t = 16) {
+	let n = Ee(e);
 	if (n === void 0) return;
 	let r = Math.round(n / (360 / t)) % t;
-	return we[16 / t * r];
+	return Te[16 / t * r];
 }
 //#endregion
 //#region src/station-metrics.ts
-function De(e, t, n) {
+function Oe(e, t, n) {
 	if (!e.length) return "";
 	let r = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
 	return L`
-    <section class="station-metrics" aria-label=${Q(t, "stationMetrics")}>
+    <section class="station-metrics" aria-label=${Z(t, "stationMetrics")}>
       ${e.map((e) => {
-		let i = e.key === "wind_direction_entity" && e.value !== void 0 ? Ee(e.value, n === "compact" ? 8 : 16) : void 0, a = e.value === void 0 ? Q(t, "unavailable") : i ? `${Q(t, i)} (${r.format(Te(e.value))}°)` : `${r.format(e.value)} ${e.unit}`;
+		let i = e.key === "wind_direction_entity" && e.value !== void 0 ? De(e.value, n === "compact" ? 8 : 16) : void 0, a = e.value === void 0 ? Z(t, "unavailable") : i ? `${Z(t, i)} (${r.format(Ee(e.value))}°)` : `${r.format(e.value)} ${e.unit}`;
 		return L`
           <div class="metric" data-metric=${e.key}>
-            <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Q(t, e.label)}</div>
+            <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Z(t, e.label)}</div>
             <div class="metric-value">${a}</div>
           </div>
         `;
@@ -776,7 +776,7 @@ function De(e, t, n) {
 }
 //#endregion
 //#region src/forecast-stream.ts
-var Oe = class {
+var ke = class {
 	constructor(e) {
 		this.changed = e, this.status = "idle", this.generation = 0;
 	}
@@ -807,21 +807,21 @@ var Oe = class {
 			this.key = void 0, this.connection = void 0, this.forecast = void 0, this.status = "error", this.changed();
 		}
 	}
-}, ke = {
+}, Ae = {
 	compact: 4,
 	standard: 8,
 	wide: 12
-}, Ae = {
+}, je = {
 	compact: 2,
 	standard: 3,
 	wide: 4
 };
-function je(e, t = "auto") {
+function Me(e, t = "auto") {
 	return t === "auto" ? !Number.isFinite(e) || e <= 0 ? "standard" : e < 360 ? "compact" : e < 600 ? "standard" : "wide" : t;
 }
 //#endregion
 //#region src/hourly-forecast.ts
-var Me = {
+var Q = {
 	"clear-night": "mdi:weather-night",
 	cloudy: "mdi:weather-cloudy",
 	fog: "mdi:weather-fog",
@@ -855,14 +855,14 @@ function Ne(e, t, n, r) {
 	}
 	let a = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
 	return L`
-    <div class="hourly-strip" role="list" tabindex="0" aria-label=${Q(t, "hourlyForecast")}>
+    <div class="hourly-strip" role="list" tabindex="0" aria-label=${Z(t, "hourlyForecast")}>
       ${e.map((e) => L`
         <div class="hourly-period" role="listitem">
           <time datetime=${new Date(e.timestamp).toISOString()}>${i.format(e.timestamp)}</time>
-          ${e.condition && Object.hasOwn(Me, e.condition) ? L`<ha-icon .icon=${Me[e.condition]} role="img" aria-label=${Q(t, e.condition)}></ha-icon>` : ""}
+          ${e.condition && Object.hasOwn(Q, e.condition) ? L`<ha-icon .icon=${Q[e.condition]} role="img" aria-label=${Z(t, e.condition)}></ha-icon>` : ""}
           <div class="hourly-temperature">${a.format(e.temperature)} ${r}</div>
           ${e.probability === void 0 ? "" : L`
-            <div class="hourly-probability" aria-label=${`${Q(t, "precipitationProbability")}: ${a.format(e.probability)}%`}>
+            <div class="hourly-probability" aria-label=${`${Z(t, "precipitationProbability")}: ${a.format(e.probability)}%`}>
               <ha-icon icon="mdi:water" aria-hidden="true"></ha-icon>${a.format(e.probability)}%
             </div>`}
         </div>
@@ -872,9 +872,25 @@ function Ne(e, t, n, r) {
 }
 //#endregion
 //#region src/skyscoop-card.ts
-var $ = "skyscoop-card", Pe = class extends J {
+var $ = "skyscoop-card", Pe = {
+	"clear-night": "neutral",
+	cloudy: "neutral",
+	fog: "neutral",
+	hail: "cold",
+	lightning: "storm",
+	"lightning-rainy": "storm",
+	partlycloudy: "warm",
+	pouring: "wet",
+	rainy: "wet",
+	snowy: "cold",
+	"snowy-rainy": "cold",
+	sunny: "warm",
+	windy: "neutral",
+	"windy-variant": "neutral",
+	exceptional: "storm"
+}, Fe = class extends J {
 	constructor(...e) {
-		super(...e), this.summaryStream = new Oe(() => this.requestUpdate()), this.hourlyStream = new Oe(() => this.requestUpdate()), this.widthLayout = "standard";
+		super(...e), this.summaryStream = new ke(() => this.requestUpdate()), this.hourlyStream = new ke(() => this.requestUpdate()), this.widthLayout = "standard";
 	}
 	static {
 		this.properties = {
@@ -889,8 +905,13 @@ var $ = "skyscoop-card", Pe = class extends J {
       display: block;
       container-type: inline-size;
       --skyscoop-accent: var(--primary-color, #347f78);
+      --skyscoop-weather-accent: var(--primary-color, #347f78);
       --skyscoop-muted: var(--secondary-text-color, #64716f);
     }
+
+    ha-card[data-weather-tone="warm"] { --skyscoop-weather-accent: var(--warning-color, var(--primary-color, #347f78)); }
+    ha-card[data-weather-tone="storm"] { --skyscoop-weather-accent: var(--error-color, var(--primary-color, #347f78)); }
+    ha-card[data-weather-tone="cold"] { --skyscoop-weather-accent: var(--info-color, var(--primary-color, #347f78)); }
 
     ha-card {
       min-height: 112px;
@@ -939,6 +960,11 @@ var $ = "skyscoop-card", Pe = class extends J {
       background: var(--secondary-background-color, rgba(127, 127, 127, 0.12));
     }
 
+    .summary-icon.current-condition-icon {
+      color: var(--skyscoop-weather-accent);
+      background: color-mix(in srgb, var(--skyscoop-weather-accent) 14%, transparent);
+    }
+
     .summary-icon ha-icon { --mdc-icon-size: 18px; }
 
     .forecast-summary {
@@ -960,13 +986,15 @@ var $ = "skyscoop-card", Pe = class extends J {
     }
 
     .temperature {
-      color: var(--skyscoop-accent);
-      font-size: 2rem;
+      color: var(--skyscoop-weather-accent);
+      font-size: 2.5rem;
       font-weight: 600;
       line-height: 1.15;
       font-variant-numeric: tabular-nums;
       overflow-wrap: anywhere;
     }
+
+    .forecast-summary .summary-icon { color: var(--skyscoop-muted); }
 
     .message {
       grid-column: 1 / -1;
@@ -991,21 +1019,26 @@ var $ = "skyscoop-card", Pe = class extends J {
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr));
-      gap: 16px;
+      column-gap: 16px;
+      row-gap: 20px;
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
-      padding-top: 12px;
+      padding-top: 16px;
     }
 
     .metric { min-width: 0; overflow-wrap: anywhere; }
-    .metric-value { font-variant-numeric: tabular-nums; margin-top: 4px; }
-    .metric ha-icon { --mdc-icon-size: 18px; margin-right: 4px; color: var(--skyscoop-muted); }
-    .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 12px; }
-    .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 8px; padding-top: 12px; }
-    .hourly-period { display: grid; grid-template-rows: 24px 28px minmax(24px, auto) 24px; align-items: center; justify-items: center; font-size: 0.8125rem; overflow-wrap: anywhere; text-align: center; }
+    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; line-height: 1.3; }
+    .metric-value { margin-top: 6px; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
+    .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
+    .hourly > .label { font-weight: 500; }
+    .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 0; margin-top: 12px; padding: 8px 0; border-block: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); }
+    .hourly-period { display: grid; grid-template-rows: 24px 28px minmax(24px, auto) 24px; align-items: center; justify-items: center; min-width: 0; padding-inline: 6px; border-inline-end: 1px solid var(--divider-color, rgba(127, 127, 127, 0.16)); font-size: 0.8125rem; overflow-wrap: anywhere; text-align: center; }
+    .hourly-period:last-child { border-inline-end: 0; }
     .hourly-period time { grid-row: 1; }
     .hourly-period > ha-icon { grid-row: 2; --mdc-icon-size: 24px; color: var(--skyscoop-muted); }
-    .hourly-temperature { grid-row: 3; font-weight: 500; font-variant-numeric: tabular-nums; }
-    .hourly-probability { grid-row: 4; color: var(--skyscoop-muted); }
+    .hourly-period time, .hourly-probability { color: var(--skyscoop-muted); font-size: 0.75rem; }
+    .hourly-temperature { grid-row: 3; font-size: 0.875rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .hourly-probability { grid-row: 4; }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
     @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -1016,7 +1049,7 @@ var $ = "skyscoop-card", Pe = class extends J {
 	connectedCallback() {
 		super.connectedCallback(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((e) => {
 			let t = e[0]?.contentRect.width;
-			t && t > 0 && (this.widthLayout = je(t));
+			t && t > 0 && (this.widthLayout = Me(t));
 		}), this.resizeObserver.observe(this)), this.hasUpdated && (this.syncForecastSubscription(), this.syncSummaryTimer());
 	}
 	disconnectedCallback() {
@@ -1038,7 +1071,7 @@ var $ = "skyscoop-card", Pe = class extends J {
 	}
 	getCardSize() {
 		let e = this.activeLayout;
-		return 2 + Math.ceil(ve(this.hass, this.config).length / Ae[e]) + +!!this.config?.weather_entity + (this.hourlyEnabled ? 3 : 0);
+		return 2 + Math.ceil(ye(this.hass, this.config).length / je[e]) + +!!this.config?.weather_entity + (this.hourlyEnabled ? 3 : 0);
 	}
 	get activeLayout() {
 		return this.config?.layout && this.config.layout !== "auto" ? this.config.layout : this.widthLayout;
@@ -1071,54 +1104,56 @@ var $ = "skyscoop-card", Pe = class extends J {
 		return document.createElement("skyscoop-card-editor");
 	}
 	render() {
-		let e = this.hass?.language, t = this.config?.temperature_entity, n = _e(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Se(this.summaryStream.forecast, l, c), d = this.activeLayout, f = ve(this.hass, this.config), p = ye(this.hourlyStream.forecast, l, ke[d]), m = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "", h = u?.kind === "low" ? "mdi:thermometer-chevron-down" : u ? "mdi:thermometer-chevron-up" : "mdi:thermometer";
+		let e = this.hass?.language, t = this.config?.temperature_entity, n = ve(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Ce(this.summaryStream.forecast, l, c), d = this.activeLayout, f = ye(this.hass, this.config), p = be(this.hourlyStream.forecast, l, Ae[d]), m = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "", h = u?.kind === "low" ? "mdi:thermometer-chevron-down" : u ? "mdi:thermometer-chevron-up" : "mdi:thermometer", g = s && Object.hasOwn(Q, s.state) ? s.state : void 0, _ = g ? Q[g] : "mdi:thermometer", v = g ? Pe[g] : void 0;
 		return L`
-      <ha-card .header=${this.config?.name?.trim() || void 0} data-layout=${d} style=${`--metric-columns: ${Ae[d]}`}>
+      <ha-card .header=${this.config?.name?.trim() || void 0} data-layout=${d} data-weather-tone=${v} style=${`--metric-columns: ${je[d]}`}>
         <div class="content">
           <div class="temperature-row ${t ? "has-temperature" : ""} ${o ? "has-forecast" : ""}">
             ${t ? L`
                   <div class="reading">
                     <div class="label summary-label">
-                      <span class="summary-icon"><ha-icon icon="mdi:thermometer" aria-hidden="true"></ha-icon></span>
-                      <span>${Q(e, "temperature")}</span>
+                      <span class="summary-icon current-condition-icon">
+                        <ha-icon icon=${_} role="img" aria-label=${Z(e, g ?? "temperature")}></ha-icon>
+                      </span>
+                      <span>${Z(e, "temperature")}</span>
                     </div>
                     <div class="value-line">
-                      <div class="temperature" aria-label=${Q(e, "temperature")}>
-                        ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Q(e, "unavailable")}
+                      <div class="temperature" aria-label=${Z(e, "temperature")}>
+                        ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Z(e, "unavailable")}
                       </div>
                       ${a ? L`<div class="unit">${a}</div>` : ""}
                     </div>
                   </div>
-                ` : L`<div class="message">${Q(e, "chooseTemperature")}</div>`}
+                ` : L`<div class="message">${Z(e, "chooseTemperature")}</div>`}
             ${o ? L`
                   <div class="reading forecast-summary">
                     <div class="label summary-label">
                       <span class="summary-icon"><ha-icon icon=${h} aria-hidden="true"></ha-icon></span>
                       <span>
-                        ${Q(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
+                        ${Z(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
                       </span>
                     </div>
                     <div class="value-line">
                       <div class="forecast-value">
-                        ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Q(e, "forecastUnavailable")}
+                        ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Z(e, "forecastUnavailable")}
                       </div>
                       ${u && m ? L`<div class="unit">${m}</div>` : ""}
                     </div>
                   </div>
                 ` : ""}
           </div>
-          ${De(f, e, d)}
+          ${Oe(f, e, d)}
           ${o && this.hourlyEnabled ? L`
-            <section class="hourly" aria-label=${Q(e, "hourlyForecast")}>
-              <div class="label">${Q(e, "hourlyForecast")}</div>
-              ${p.length ? Ne(p, e, c, m) : L`<div class="message" role="status">${Q(e, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
+            <section class="hourly" aria-label=${Z(e, "hourlyForecast")}>
+              <div class="label">${Z(e, "hourlyForecast")}</div>
+              ${p.length ? Ne(p, e, c, m) : L`<div class="message" role="status">${Z(e, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
             </section>
           ` : ""}
         </div>
       </ha-card>
     `;
 	}
-}, Fe = class extends J {
+}, Ie = class extends J {
 	constructor(...e) {
 		super(...e), this.config = {};
 	}
@@ -1171,37 +1206,37 @@ var $ = "skyscoop-card", Pe = class extends J {
 	render() {
 		return L`
       <label class="name-field">
-        ${Q(this.hass?.language, "cardHeader")}
+        ${Z(this.hass?.language, "cardHeader")}
         <input type="text" .value=${this.config.name ?? ""} @input=${this.onNameChanged}>
       </label>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.temperature_entity ?? ""}
-        .label=${Q(this.hass?.language, "temperatureEntity")}
+        .label=${Z(this.hass?.language, "temperatureEntity")}
         .includeDomains=${["sensor"]}
         @value-changed=${this.onTemperatureChanged}
       ></ha-entity-picker>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.weather_entity ?? ""}
-        .label=${Q(this.hass?.language, "weatherEntity")}
+        .label=${Z(this.hass?.language, "weatherEntity")}
         .includeDomains=${["weather"]}
         @value-changed=${this.onWeatherChanged}
       ></ha-entity-picker>
       <details>
-        <summary>${Q(this.hass?.language, "stationMetrics")}</summary>
-        ${Y.map((e) => L`
+        <summary>${Z(this.hass?.language, "stationMetrics")}</summary>
+        ${_e.map((e) => L`
           <ha-entity-picker
             .hass=${this.hass}
             .value=${this.config[e.key] ?? ""}
-            .label=${Q(this.hass?.language, e.label)}
+            .label=${Z(this.hass?.language, e.label)}
             .includeDomains=${["sensor"]}
             @value-changed=${(t) => this.updateEntity(e.key, t.detail?.value)}
           ></ha-entity-picker>
         `)}
       </details>
       <label>
-        ${Q(this.hass?.language, "layout")}
+        ${Z(this.hass?.language, "layout")}
         <select @change=${(e) => {
 			this.config = {
 				...this.config,
@@ -1214,7 +1249,7 @@ var $ = "skyscoop-card", Pe = class extends J {
 			"standard",
 			"wide"
 		].map((e) => L`
-            <option value=${e} ?selected=${(this.config.layout ?? "auto") === e}>${Q(this.hass?.language, e)}</option>
+            <option value=${e} ?selected=${(this.config.layout ?? "auto") === e}>${Z(this.hass?.language, e)}</option>
           `)}
         </select>
       </label>
@@ -1226,12 +1261,12 @@ var $ = "skyscoop-card", Pe = class extends J {
 				show_hourly_forecast: e.target.checked
 			}, this.emitConfig();
 		}}>
-        ${Q(this.hass?.language, "hourlyForecast")}
+        ${Z(this.hass?.language, "hourlyForecast")}
       </label>
     `;
 	}
 };
-customElements.get("skyscoop-card") || customElements.define($, Pe), customElements.get("skyscoop-card-editor") || customElements.define("skyscoop-card-editor", Fe), window.customCards ??= [], window.customCards.some((e) => e.type === "skyscoop-card") || window.customCards.push({
+customElements.get("skyscoop-card") || customElements.define($, Fe), customElements.get("skyscoop-card-editor") || customElements.define("skyscoop-card-editor", Ie), window.customCards ??= [], window.customCards.some((e) => e.type === "skyscoop-card") || window.customCards.push({
 	type: $,
 	name: "SkyScoop",
 	description: "Weather-station observations and forecast data.",

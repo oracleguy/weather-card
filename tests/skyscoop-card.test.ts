@@ -99,6 +99,8 @@ describe("SkyScoop card", () => {
     expect(card.shadowRoot?.querySelector(".temperature")?.textContent).toContain("18.5");
     expect(card.shadowRoot?.querySelector(".forecast-value")?.textContent).toMatch(/27|13/);
     expect(card.shadowRoot?.querySelector(".temperature-row")?.classList.contains("has-forecast")).toBe(true);
+    expect(card.shadowRoot?.querySelector(".current-condition-icon ha-icon")?.getAttribute("icon")).toBe("mdi:weather-sunny");
+    expect(card.shadowRoot?.querySelector("ha-card")?.getAttribute("data-weather-tone")).toBe("warm");
     expect(card.shadowRoot?.querySelector(".forecast-summary .unit")?.textContent).toBe("°F");
   });
 

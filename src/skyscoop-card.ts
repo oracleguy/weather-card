@@ -7,9 +7,16 @@ import { renderStationMetrics } from "./station-metrics.js";
 import type { ForecastType, HassLike, SkyScoopConfig } from "./types.js";
 import { ForecastStream } from "./forecast-stream.js";
 import { hourlyCounts, metricColumns, selectLayout, type Layout } from "./responsive.js";
-import { renderHourlyForecast } from "./hourly-forecast.js";
+import { conditionIcons, renderHourlyForecast } from "./hourly-forecast.js";
 
 export const CARD_TAG = "skyscoop-card";
+
+const conditionTones = {
+  "clear-night": "neutral", cloudy: "neutral", fog: "neutral", hail: "cold",
+  lightning: "storm", "lightning-rainy": "storm", partlycloudy: "warm", pouring: "wet",
+  rainy: "wet", snowy: "cold", "snowy-rainy": "cold", sunny: "warm",
+  windy: "neutral", "windy-variant": "neutral", exceptional: "storm",
+} as const;
 
 export class SkyScoopCard extends LitElement {
   static properties = {
@@ -23,8 +30,13 @@ export class SkyScoopCard extends LitElement {
       display: block;
       container-type: inline-size;
       --skyscoop-accent: var(--primary-color, #347f78);
+      --skyscoop-weather-accent: var(--primary-color, #347f78);
       --skyscoop-muted: var(--secondary-text-color, #64716f);
     }
+
+    ha-card[data-weather-tone="warm"] { --skyscoop-weather-accent: var(--warning-color, var(--primary-color, #347f78)); }
+    ha-card[data-weather-tone="storm"] { --skyscoop-weather-accent: var(--error-color, var(--primary-color, #347f78)); }
+    ha-card[data-weather-tone="cold"] { --skyscoop-weather-accent: var(--info-color, var(--primary-color, #347f78)); }
 
     ha-card {
       min-height: 112px;
@@ -73,6 +85,11 @@ export class SkyScoopCard extends LitElement {
       background: var(--secondary-background-color, rgba(127, 127, 127, 0.12));
     }
 
+    .summary-icon.current-condition-icon {
+      color: var(--skyscoop-weather-accent);
+      background: color-mix(in srgb, var(--skyscoop-weather-accent) 14%, transparent);
+    }
+
     .summary-icon ha-icon { --mdc-icon-size: 18px; }
 
     .forecast-summary {
@@ -94,13 +111,15 @@ export class SkyScoopCard extends LitElement {
     }
 
     .temperature {
-      color: var(--skyscoop-accent);
-      font-size: 2rem;
+      color: var(--skyscoop-weather-accent);
+      font-size: 2.5rem;
       font-weight: 600;
       line-height: 1.15;
       font-variant-numeric: tabular-nums;
       overflow-wrap: anywhere;
     }
+
+    .forecast-summary .summary-icon { color: var(--skyscoop-muted); }
 
     .message {
       grid-column: 1 / -1;
@@ -125,21 +144,26 @@ export class SkyScoopCard extends LitElement {
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr));
-      gap: 16px;
+      column-gap: 16px;
+      row-gap: 20px;
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
-      padding-top: 12px;
+      padding-top: 16px;
     }
 
     .metric { min-width: 0; overflow-wrap: anywhere; }
-    .metric-value { font-variant-numeric: tabular-nums; margin-top: 4px; }
-    .metric ha-icon { --mdc-icon-size: 18px; margin-right: 4px; color: var(--skyscoop-muted); }
-    .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 12px; }
-    .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 8px; padding-top: 12px; }
-    .hourly-period { display: grid; grid-template-rows: 24px 28px minmax(24px, auto) 24px; align-items: center; justify-items: center; font-size: 0.8125rem; overflow-wrap: anywhere; text-align: center; }
+    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; line-height: 1.3; }
+    .metric-value { margin-top: 6px; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
+    .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
+    .hourly > .label { font-weight: 500; }
+    .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 0; margin-top: 12px; padding: 8px 0; border-block: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); }
+    .hourly-period { display: grid; grid-template-rows: 24px 28px minmax(24px, auto) 24px; align-items: center; justify-items: center; min-width: 0; padding-inline: 6px; border-inline-end: 1px solid var(--divider-color, rgba(127, 127, 127, 0.16)); font-size: 0.8125rem; overflow-wrap: anywhere; text-align: center; }
+    .hourly-period:last-child { border-inline-end: 0; }
     .hourly-period time { grid-row: 1; }
     .hourly-period > ha-icon { grid-row: 2; --mdc-icon-size: 24px; color: var(--skyscoop-muted); }
-    .hourly-temperature { grid-row: 3; font-weight: 500; font-variant-numeric: tabular-nums; }
-    .hourly-probability { grid-row: 4; color: var(--skyscoop-muted); }
+    .hourly-period time, .hourly-probability { color: var(--skyscoop-muted); font-size: 0.75rem; }
+    .hourly-temperature { grid-row: 3; font-size: 0.875rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .hourly-probability { grid-row: 4; }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
     @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -294,17 +318,24 @@ export class SkyScoopCard extends LitElement {
     const forecastIcon = forecastSummary?.kind === "low"
       ? "mdi:thermometer-chevron-down"
       : forecastSummary ? "mdi:thermometer-chevron-up" : "mdi:thermometer";
+    const weatherCondition = weatherEntity && Object.hasOwn(conditionIcons, weatherEntity.state)
+      ? weatherEntity.state as keyof typeof conditionIcons
+      : undefined;
+    const weatherIcon = weatherCondition ? conditionIcons[weatherCondition] : "mdi:thermometer";
+    const weatherTone = weatherCondition ? conditionTones[weatherCondition] : undefined;
     const header = this.config?.name?.trim() || undefined;
 
     return html`
-      <ha-card .header=${header} data-layout=${layout} style=${`--metric-columns: ${metricColumns[layout]}`}>
+      <ha-card .header=${header} data-layout=${layout} data-weather-tone=${weatherTone} style=${`--metric-columns: ${metricColumns[layout]}`}>
         <div class="content">
           <div class="temperature-row ${entityId ? "has-temperature" : ""} ${weatherEntityId ? "has-forecast" : ""}">
             ${entityId
               ? html`
                   <div class="reading">
                     <div class="label summary-label">
-                      <span class="summary-icon"><ha-icon icon="mdi:thermometer" aria-hidden="true"></ha-icon></span>
+                      <span class="summary-icon current-condition-icon">
+                        <ha-icon icon=${weatherIcon} role="img" aria-label=${translate(language, weatherCondition ?? "temperature")}></ha-icon>
+                      </span>
                       <span>${translate(language, "temperature")}</span>
                     </div>
                     <div class="value-line">
