@@ -2,7 +2,7 @@ import { html } from "lit";
 import type { HourlyPeriod } from "./forecast.js";
 import { translate } from "./localization.js";
 
-const conditionIcons = {
+export const conditionIcons = {
   "clear-night": "mdi:weather-night", cloudy: "mdi:weather-cloudy", fog: "mdi:weather-fog",
   hail: "mdi:weather-hail", lightning: "mdi:weather-lightning", "lightning-rainy": "mdi:weather-lightning-rainy",
   partlycloudy: "mdi:weather-partly-cloudy", pouring: "mdi:weather-pouring", rainy: "mdi:weather-rainy",

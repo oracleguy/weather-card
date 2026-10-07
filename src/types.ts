@@ -33,6 +33,14 @@ export interface HassLike {
   language?: string;
   config?: { time_zone?: string };
   connection?: HassConnection;
+  callApi?<T>(method: "GET", path: string): Promise<T>;
+}
+
+export interface RainfallHistoryState {
+  state?: unknown;
+  last_changed?: unknown;
+  last_updated?: unknown;
+  attributes?: { unit_of_measurement?: unknown };
 }
 
 export interface SkyScoopConfig {
@@ -47,6 +55,12 @@ export interface SkyScoopConfig {
   wind_direction_entity?: string;
   uv_index_entity?: string;
   illuminance_entity?: string;
+  rain_state_entity?: string;
+  rainfall_rate_entity?: string;
+  rainfall_today_entity?: string;
+  rainfall_week_entity?: string;
+  adaptive_metrics?: boolean;
+  show_rainfall_history?: boolean;
   layout?: "auto" | "compact" | "standard" | "wide";
   show_hourly_forecast?: boolean;
 }

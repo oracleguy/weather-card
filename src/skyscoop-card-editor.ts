@@ -2,6 +2,7 @@ import { LitElement, css, html } from "lit";
 import type { HassLike, SkyScoopConfig } from "./types.js";
 import { translate } from "./localization.js";
 import { stationMetrics, type StationEntityKey } from "./station.js";
+import { rainfallMetrics, type RainfallEntityKey } from "./rainfall.js";
 
 export class SkyScoopCardEditor extends LitElement {
   static styles = css`
@@ -10,6 +11,8 @@ export class SkyScoopCardEditor extends LitElement {
     summary { cursor: pointer; padding: 8px 0; }
     ha-entity-picker { display: block; margin-bottom: 8px; }
     label { display: flex; align-items: center; gap: 12px; color: var(--primary-text-color); }
+    .name-field { display: grid; align-items: start; gap: 4px; }
+    .name-field input { box-sizing: border-box; width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--divider-color, #888); border-radius: 4px; color: var(--primary-text-color); background: var(--card-background-color); font: inherit; }
     select { font: inherit; color: var(--primary-text-color); background: var(--card-background-color); padding: 8px; min-width: 0; }
   `;
 
@@ -38,7 +41,21 @@ export class SkyScoopCardEditor extends LitElement {
     this.updateEntity("weather_entity", (event as CustomEvent<{ value?: string }>).detail?.value);
   }
 
-  private updateEntity(key: "temperature_entity" | "weather_entity" | StationEntityKey, value?: string): void {
+  private onNameChanged(event: Event): void {
+    const name = (event.currentTarget as HTMLInputElement).value;
+    const config = { ...this.config };
+
+    if (name) {
+      config.name = name;
+    } else {
+      delete config.name;
+    }
+
+    this.config = config;
+    this.emitConfig();
+  }
+
+  private updateEntity(key: "temperature_entity" | "weather_entity" | StationEntityKey | RainfallEntityKey, value?: string): void {
     const config = { ...this.config };
 
     if (value) {
@@ -61,6 +78,10 @@ export class SkyScoopCardEditor extends LitElement {
 
   render() {
     return html`
+      <label class="name-field">
+        ${translate(this.hass?.language, "cardHeader")}
+        <input type="text" .value=${this.config.name ?? ""} @input=${this.onNameChanged}>
+      </label>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.temperature_entity ?? ""}
@@ -79,6 +100,27 @@ export class SkyScoopCardEditor extends LitElement {
         <summary>${translate(this.hass?.language, "stationMetrics")}</summary>
         ${stationMetrics.map((metric) => html`
           <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this.config[metric.key] ?? ""}
+            .label=${translate(this.hass?.language, metric.label)}
+            .includeDomains=${["sensor"]}
+            @value-changed=${(event: CustomEvent<{ value?: string }>) => this.updateEntity(metric.key, event.detail?.value)}
+          ></ha-entity-picker>
+        `)}
+      </details>
+      <details>
+        <summary>${translate(this.hass?.language, "rainfall")}</summary>
+        <ha-entity-picker
+          data-entity-key="rain_state_entity"
+          .hass=${this.hass}
+          .value=${this.config.rain_state_entity ?? ""}
+          .label=${translate(this.hass?.language, "rainStateEntity")}
+          .includeDomains=${["binary_sensor"]}
+          @value-changed=${(event: CustomEvent<{ value?: string }>) => this.updateEntity("rain_state_entity", event.detail?.value)}
+        ></ha-entity-picker>
+        ${rainfallMetrics.map((metric) => html`
+          <ha-entity-picker
+            data-entity-key=${metric.key}
             .hass=${this.hass}
             .value=${this.config[metric.key] ?? ""}
             .label=${translate(this.hass?.language, metric.label)}
@@ -106,6 +148,16 @@ export class SkyScoopCardEditor extends LitElement {
           }}>
         ${translate(this.hass?.language, "hourlyForecast")}
       </label>
+      ${([{ key: "adaptive_metrics", label: "adaptiveMetrics" }, { key: "show_rainfall_history", label: "showRainfallHistory" }] as const).map((option) => html`
+        <label>
+          <input type="checkbox" data-option=${option.key} .checked=${this.config[option.key] !== false}
+            @change=${(event: Event) => {
+              this.config = { ...this.config, [option.key]: (event.target as HTMLInputElement).checked };
+              this.emitConfig();
+            }}>
+          ${translate(this.hass?.language, option.label)}
+        </label>
+      `)}
     `;
   }
 }
