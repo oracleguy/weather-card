@@ -41,7 +41,11 @@ Manual layout and density overrides may be provided for users who want fixed beh
 
 ## Installation
 
-The initial distribution target is a custom HACS frontend repository. Install SkyScoop through HACS, then add its JavaScript resource if HACS does not add it automatically. The compiled `skyscoop-card.js` asset is built from the TypeScript source; releases will publish that asset.
+The initial distribution target is a custom HACS frontend repository. Install SkyScoop through HACS, then add its JavaScript resource if HACS does not add it automatically. For the `weather-card` repository, the resource URL is `/hacsfiles/weather-card/skyscoop-card.js` and its type must be **JavaScript Module**.
+
+HACS installations require a GitHub release with the compiled `skyscoop-card.js` attached as a release asset. Run `npm run build` and upload `dist/skyscoop-card.js` under the asset name `skyscoop-card.js`. The build directory is not committed, and the current CI workflow does not publish release assets. A source-only release or default-branch download is not sufficient.
+
+If the console reports "Failed to load Lovelace resource", check the resource request in the browser's Network tab. A 404 indicates a missing file or incorrect URL. Verify that the installed release contains the JavaScript asset, redownload that release through HACS, and hard-refresh the browser. The card cannot appear in the picker until its module loads successfully.
 
 ## Development
 
