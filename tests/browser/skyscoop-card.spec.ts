@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { mdiWaterPercent, mdiThermometer, mdiThermometerChevronUp, mdiThermometerChevronDown, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWeatherSunny, mdiWater } from "@mdi/js";
+import { mdiWaterPercent, mdiThermometer, mdiThermometerChevronUp, mdiThermometerChevronDown, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWeatherSunny, mdiWater, mdiWeatherPouring, mdiCalendarWeek } from "@mdi/js";
 
 const fixtureIcons = {
   "mdi:water-percent": mdiWaterPercent, "mdi:thermometer": mdiThermometer,
@@ -11,6 +11,7 @@ const fixtureIcons = {
   "mdi:weather-sunny-alert": mdiWeatherSunnyAlert, "mdi:brightness-6": mdiBrightness6,
   "mdi:weather-cloudy": mdiWeatherCloudy, "mdi:weather-rainy": mdiWeatherRainy, "mdi:water": mdiWater,
   "mdi:weather-sunny": mdiWeatherSunny,
+  "mdi:weather-pouring": mdiWeatherPouring, "mdi:calendar-week": mdiCalendarWeek,
 };
 
 async function mountCompleteCard(page: Page, width: number, language = "en-US") {
@@ -23,6 +24,8 @@ async function mountCompleteCard(page: Page, width: number, language = "en-US") 
       humidity_entity: "sensor.humidity", dew_point_entity: "sensor.dew",
       wind_speed_entity: "sensor.wind", wind_gust_entity: "sensor.gust",
       wind_direction_entity: "sensor.direction", uv_index_entity: "sensor.uv", illuminance_entity: "sensor.lux",
+      rain_state_entity: "binary_sensor.rain", rainfall_rate_entity: "sensor.rate",
+      rainfall_today_entity: "sensor.today", rainfall_week_entity: "sensor.week",
     });
     card.hass = {
       language, config: { time_zone: "America/Los_Angeles" },
@@ -35,7 +38,19 @@ async function mountCompleteCard(page: Page, width: number, language = "en-US") 
         "sensor.direction": { state: "360", attributes: { unit_of_measurement: "°" } },
         "sensor.uv": { state: "0", attributes: {} },
         "sensor.lux": { state: "12400", attributes: { unit_of_measurement: "lx" } },
+        "binary_sensor.rain": { state: "off", attributes: {} },
+        "sensor.rate": { state: "0", attributes: { unit_of_measurement: "mm/h" } },
+        "sensor.today": { state: "12.5", attributes: { unit_of_measurement: "mm" } },
+        "sensor.week": { state: "unavailable", attributes: { unit_of_measurement: "mm" } },
         "weather.home": { state: "sunny", attributes: { supported_features: 3, temperature_unit: "°F" } },
+      },
+      callApi: async (_method: string, path: string) => {
+        (window as any).skyscoopHistoryCalls = ((window as any).skyscoopHistoryCalls ?? 0) + 1;
+        (window as any).skyscoopHistoryPath = path;
+        if ((window as any).skyscoopHistoryError) throw new Error("Recorder unavailable");
+        return [(window as any).skyscoopRainHistory ?? [{
+          state: "0", last_changed: "2026-10-06T12:00:00Z", attributes: { unit_of_measurement: "mm/h" },
+        }]];
       },
       connection: {
         subscribeMessage: async (callback: (event: any) => void, message: any) => {
@@ -193,11 +208,13 @@ test("responds to allocated width with full station metrics and independent fore
     await expect(card.locator("ha-card")).toHaveAttribute("data-layout", layout);
     await expect(card.locator(".hourly-period")).toHaveCount(count);
     await expect(card.locator(".metric")).toHaveCount(7);
+    await expect(card.locator(".rainfall-metric")).toHaveCount(3);
+    await expect(card.locator(".rainfall-plot path")).toHaveAttribute("d", /M0,74\.00 H10/);
     await expect(card.locator(".temperature")).toHaveText("18.5");
     await expect(card.locator(".forecast-value")).toHaveText("66");
     const fits = await card.evaluate((element) => {
       const root = element.shadowRoot!;
-      return [...root.querySelectorAll<HTMLElement>(".content, .metric, .temperature, .label, .hourly-period")]
+      return [...root.querySelectorAll<HTMLElement>(".content, .metric, .temperature, .label, .hourly-period, .rainfall, .rainfall-metric, .rainfall-caption, .rainfall-status")]
         .every((item) => item.scrollWidth <= item.clientWidth + 1);
     });
     expect(fits).toBe(true);
@@ -249,11 +266,105 @@ test("built editor keeps configured layout and exposes optional controls", async
   const nameInput = editor.locator(".name-field input");
   await expect(nameInput).toHaveValue("");
   await expect(editor.locator("select")).toHaveValue("wide");
-  await expect(editor.locator("input[type=checkbox]")).not.toBeChecked();
-  await expect(editor.locator("ha-entity-picker")).toHaveCount(9);
+  await expect(editor.locator("input[type=checkbox]").first()).not.toBeChecked();
+  await expect(editor.locator("[data-option=adaptive_metrics]")).toBeChecked();
+  await expect(editor.locator("[data-option=show_rainfall_history]")).toBeChecked();
+  await expect(editor.locator("ha-entity-picker")).toHaveCount(13);
   await nameInput.fill("Backyard");
   await editor.locator("select").selectOption("compact");
-  await editor.locator("input[type=checkbox]").check();
+  await editor.locator("input[type=checkbox]").first().check();
   const config = await editor.evaluate((element: any) => element.config);
   expect(config).toEqual({ temperature_entity: "sensor.outdoor", layout: "compact", show_hourly_forecast: true, name: "Backyard" });
+  await editor.locator("[data-option=adaptive_metrics]").uncheck();
+  await editor.locator("[data-option=show_rainfall_history]").uncheck();
+  await editor.locator("[data-entity-key=rainfall_rate_entity]").evaluate((picker) => {
+    picker.dispatchEvent(new CustomEvent("value-changed", { detail: { value: "sensor.rain_rate" } }));
+  });
+  expect(await editor.evaluate((element: any) => element.config)).toEqual({ ...config,
+    adaptive_metrics: false, show_rainfall_history: false, rainfall_rate_entity: "sensor.rain_rate" });
+});
+
+test("rainfall and adaptive emphasis keep fixed positions at each width", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1100, height: 1500 });
+  await mountCompleteCard(page, 280);
+  const card = page.locator("skyscoop-card");
+  await expect(card.locator(".rainfall-status")).toHaveText("Dry");
+  await expect(card.locator(".rainfall-caption")).toContainText("Peak rate: 0 mm/h");
+  for (const width of [280, 359, 360, 599, 600, 900]) {
+    await card.evaluate(async (element: any, width) => {
+      element.style.width = `${width}px`;
+      element.hass = { ...element.hass, states: { ...element.hass.states,
+        "binary_sensor.rain": { state: "off", attributes: {} },
+        "sensor.rate": { state: "0", attributes: { unit_of_measurement: "mm/h" } },
+        "sensor.wind": { state: "3.5", attributes: { unit_of_measurement: "m/s" } },
+        "sensor.uv": { state: "0", attributes: {} },
+      } };
+      await element.updateComplete;
+    }, width);
+    await expect(card.locator("ha-card")).toHaveAttribute("data-layout", width < 360 ? "compact" : width < 600 ? "standard" : "wide");
+    const positions = () => card.evaluate((element) => [...element.shadowRoot!.querySelectorAll(".metric, .rainfall-metric, .rainfall-plot")]
+      .map((item) => { const rect = item.getBoundingClientRect(); return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }; }));
+    const before = await positions();
+    await card.evaluate(async (element: any) => {
+      element.hass = { ...element.hass, states: { ...element.hass.states,
+        "binary_sensor.rain": { state: "on", attributes: {} },
+        "sensor.rate": { state: "8", attributes: { unit_of_measurement: "mm/h" } },
+        "sensor.wind": { state: "8", attributes: { unit_of_measurement: "m/s" } },
+        "sensor.uv": { state: "6", attributes: {} },
+      } };
+      await element.updateComplete;
+    });
+    await expect(card.locator(".rainfall")).toHaveAttribute("data-emphasis", "heavy");
+    await expect(card.locator(".rainfall-status")).toHaveText("Heavy rain");
+    await expect(card.locator("[data-metric=wind_speed_entity] .metric-reason")).toHaveText("Strong wind");
+    await expect(card.locator("[data-metric=uv_index_entity] .metric-reason")).toHaveText("High UV");
+    expect(await positions()).toEqual(before);
+    expect(await card.evaluate((element) => [...element.shadowRoot!.querySelectorAll<HTMLElement>(".rainfall, .rainfall-metric, .rainfall-caption, .metric-reason")]
+      .every((item) => item.scrollWidth <= item.clientWidth + 1))).toBe(true);
+    if (width === 280 || width === 900) await card.screenshot({ path: testInfo.outputPath(`rainfall-active-${width}.png`) });
+  }
+  expect(await page.evaluate(() => (window as any).skyscoopHistoryCalls)).toBe(1);
+});
+
+test("mobile rain history renders gaps, locale labels and independent error states", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 1500 });
+  await page.addInitScript(() => {
+    (window as any).skyscoopRainHistory = [
+      { state: "0", last_changed: "2026-10-06T12:00:00Z", attributes: { unit_of_measurement: "mm/h" } },
+      { state: "8", last_changed: "2026-10-06T14:00:00Z", attributes: { unit_of_measurement: "mm/h" } },
+      { state: "unavailable", last_changed: "2026-10-06T16:00:00Z", attributes: { unit_of_measurement: "mm/h" } },
+      { state: "3.5", last_changed: "2026-10-06T18:00:00Z", attributes: { unit_of_measurement: "mm/h" } },
+    ];
+  });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(customElements.get("skyscoop-card")));
+  await mountCompleteCard(page, 280, "de-DE");
+  const card = page.locator("skyscoop-card");
+  await expect(card.locator("[data-rainfall=rainfall_today_entity] .metric-value")).toHaveText("12,5 mm");
+  await expect(card.locator(".rainfall-plot")).toHaveAttribute("aria-label", /Peak rate: 8 mm\/h/);
+  const geometry = await card.locator(".rainfall-plot path").evaluate((element) => {
+    const path = element as SVGPathElement;
+    const box = path.getBBox();
+    return { moves: path.getAttribute("d")!.match(/M/g)?.length, length: path.getTotalLength(), width: box.width, height: box.height };
+  });
+  expect(geometry.moves).toBe(2);
+  expect(geometry.length).toBeGreaterThan(100);
+  expect(geometry.width).toBe(240);
+  expect(geometry.height).toBeGreaterThan(0);
+  const query = await page.evaluate(() => new URL((window as any).skyscoopHistoryPath, "http://ha/api/").searchParams.get("filter_entity_id"));
+  expect(query).toBe("sensor.rate");
+  await card.screenshot({ path: testInfo.outputPath("rainfall-mobile-gaps-de.png") });
+  await page.evaluate(() => { (window as any).skyscoopHistoryError = true; });
+  await page.clock.fastForward(300_000);
+  await expect(card.locator(".rainfall-history-status")).toContainText("History stale");
+  await expect(card.locator(".temperature")).toHaveText("18,5");
+  await expect(card.locator(".forecast-value")).toHaveText("66");
+  await expect(card.locator(".hourly-period")).toHaveCount(4);
+  await card.evaluate(async (element: any) => {
+    element.setConfig({ ...element.config, rainfall_rate_entity: "sensor.missing" });
+    await element.updateComplete;
+  });
+  await expect(card.locator(".rainfall-placeholder")).toHaveText("Rain history unavailable");
+  await expect(card.locator("[data-rainfall=rainfall_today_entity] .metric-value")).toHaveText("12,5 mm");
+  await card.screenshot({ path: testInfo.outputPath("rainfall-mobile-error-de.png") });
 });

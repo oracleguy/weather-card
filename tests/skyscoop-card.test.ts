@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import "../src/index.js";
 import { CARD_TAG, SkyScoopCard } from "../src/skyscoop-card.js";
 import { SkyScoopCardEditor } from "../src/skyscoop-card-editor.js";
-import type { ForecastSubscriptionEvent, HassLike } from "../src/types.js";
+import type { ForecastSubscriptionEvent, HassLike, SkyScoopConfig } from "../src/types.js";
 
 afterEach(() => {
   document.body.replaceChildren();
@@ -373,5 +373,165 @@ describe("station metrics, hourly forecasts and layouts", () => {
     const card = document.createElement(CARD_TAG) as SkyScoopCard;
     expect(() => card.setConfig({ layout: "other" as any })).toThrow("layout");
     expect(() => card.setConfig({ show_hourly_forecast: "false" as any })).toThrow("boolean");
+  });
+});
+
+describe("rainfall and adaptive presentation", () => {
+  it("edits and clears rainfall mappings and toggles without mutating or dropping existing options", async () => {
+    const editor = document.createElement("skyscoop-card-editor") as SkyScoopCardEditor;
+    const original = { temperature_entity: "sensor.outdoor", weather_entity: "weather.home", name: "Backyard", layout: "wide" as const };
+    editor.setConfig(original);
+    document.body.append(editor);
+    await editor.updateComplete;
+    const events: CustomEvent[] = [];
+    editor.addEventListener("config-changed", (event) => events.push(event as CustomEvent));
+    for (const key of ["rain_state_entity", "rainfall_rate_entity", "rainfall_today_entity", "rainfall_week_entity"] as const) {
+      const picker = editor.shadowRoot?.querySelector(`[data-entity-key="${key}"]`) as HTMLElement & { includeDomains: string[] };
+      const domain = key === "rain_state_entity" ? "binary_sensor" : "sensor";
+      expect(picker.includeDomains).toEqual([domain]);
+      picker.dispatchEvent(new CustomEvent("value-changed", { detail: { value: `${domain}.${key}` } }));
+      expect(editor.config[key]).toBe(`${domain}.${key}`);
+      picker.dispatchEvent(new CustomEvent("value-changed", { detail: { value: "" } }));
+      expect(editor.config[key]).toBeUndefined();
+    }
+    for (const key of ["adaptive_metrics", "show_rainfall_history"] as const) {
+      const input = editor.shadowRoot?.querySelector(`[data-option="${key}"]`) as HTMLInputElement;
+      expect(input.checked).toBe(true);
+      input.checked = false;
+      input.dispatchEvent(new Event("change"));
+      expect(editor.config[key]).toBe(false);
+    }
+    expect(editor.config).toEqual({ ...original, adaptive_metrics: false, show_rainfall_history: false });
+    expect(original).not.toHaveProperty("adaptive_metrics");
+    expect(events).toHaveLength(10);
+    expect(events.every((event) => event.bubbles && event.composed)).toBe(true);
+  });
+
+  async function rainfallCard(config: SkyScoopConfig = {}) {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-07T12:00:00Z"));
+    const callApi = vi.fn().mockResolvedValue([[{
+      state: "0", last_changed: "2026-10-06T12:00:00Z", attributes: { unit_of_measurement: "mm/h" },
+    }, { state: "8", last_changed: "2026-10-07T11:00:00Z", attributes: { unit_of_measurement: "mm/h" } }]]);
+    const card = document.createElement(CARD_TAG) as SkyScoopCard;
+    card.setConfig({ temperature_entity: "sensor.outdoor", rainfall_rate_entity: "sensor.rate",
+      rainfall_today_entity: "sensor.today", rainfall_week_entity: "sensor.week", ...config });
+    card.hass = { language: "de-DE", config: { time_zone: "UTC" }, callApi, states: {
+      "sensor.outdoor": { state: "18", attributes: { unit_of_measurement: "°C" } },
+      "sensor.rate": { state: "8", attributes: { unit_of_measurement: "mm/h" } },
+      "sensor.today": { state: "12.5", attributes: { unit_of_measurement: "mm" } },
+      "sensor.week": { state: "unavailable", attributes: { unit_of_measurement: "mm" } },
+      "sensor.wind": { state: "8", attributes: { unit_of_measurement: "m/s" } },
+      "sensor.uv": { state: "6", attributes: {} },
+    } };
+    document.body.append(card);
+    await card.updateComplete;
+    await card.updateComplete;
+    return { card, callApi };
+  }
+
+  it("renders source totals, unavailable readings and a labeled hourly-peak plot", async () => {
+    const { card, callApi } = await rainfallCard();
+    expect(callApi).toHaveBeenCalledOnce();
+    expect(card.shadowRoot?.querySelector('[data-rainfall="rainfall_today_entity"]')?.textContent).toContain("12,5 mm");
+    expect(card.shadowRoot?.querySelector('[data-rainfall="rainfall_week_entity"]')?.textContent).toContain("Unavailable");
+    expect(card.shadowRoot?.querySelector(".rainfall")?.getAttribute("data-emphasis")).toBe("heavy");
+    expect(card.shadowRoot?.querySelector(".rainfall-status")?.textContent).toContain("Heavy rain");
+    expect(card.shadowRoot?.querySelector(".rainfall-plot")?.getAttribute("aria-label")).toContain("Peak rate: 8 mm/h");
+    expect(card.shadowRoot?.querySelector(".rainfall-plot path")?.getAttribute("d")).toContain("H240");
+    expect(card.getCardSize()).toBeGreaterThan(5);
+  });
+
+  it("keeps metric order and rain data when adaptation or history is disabled", async () => {
+    const { card, callApi } = await rainfallCard({ wind_speed_entity: "sensor.wind", uv_index_entity: "sensor.uv", humidity_entity: "sensor.missing" });
+    const keys = () => [...card.shadowRoot!.querySelectorAll("[data-metric]")].map((metric) => metric.getAttribute("data-metric"));
+    const before = keys();
+    expect(card.shadowRoot?.querySelector('[data-metric="wind_speed_entity"] .metric-reason')?.textContent).toBe("Strong wind");
+    expect(card.shadowRoot?.querySelector('[data-metric="uv_index_entity"] .metric-reason')?.textContent).toBe("High UV");
+    const size = card.getCardSize();
+    card.setConfig({ ...card.config, adaptive_metrics: false, show_rainfall_history: false });
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(keys()).toEqual(before);
+    expect(card.shadowRoot?.querySelector(".metric-reason")?.textContent).toBe("");
+    expect(card.shadowRoot?.querySelector(".rainfall")?.getAttribute("data-emphasis")).toBe("none");
+    expect(card.shadowRoot?.querySelector(".rainfall-status")?.textContent).toContain("Heavy rain");
+    expect(card.shadowRoot?.querySelector(".rainfall-history")).toBeNull();
+    expect(card.shadowRoot?.querySelectorAll(".rainfall-metric")).toHaveLength(3);
+    expect(card.getCardSize()).toBe(size - 3);
+    await vi.advanceTimersByTimeAsync(600_000);
+    expect(callApi).toHaveBeenCalledOnce();
+  });
+
+  it("isolates history errors and marks previously fetched history stale", async () => {
+    const { card, callApi } = await rainfallCard();
+    callApi.mockRejectedValue(new Error("recorder offline"));
+    await vi.advanceTimersByTimeAsync(300_000);
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-history-status")?.textContent).toContain("History stale");
+    expect(card.shadowRoot?.querySelector(".rainfall-plot")).not.toBeNull();
+    expect(card.shadowRoot?.querySelector(".temperature")?.textContent).toContain("18");
+    card.setConfig({ ...card.config, rainfall_rate_entity: "sensor.other" });
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-placeholder")?.textContent).toContain("Rain history unavailable");
+    expect(card.shadowRoot?.querySelector('[data-rainfall="rainfall_today_entity"]')?.textContent).toContain("12,5");
+  });
+
+  it("distinguishes loading, empty, dry and missing-API history without suppressing measurements", async () => {
+    const { card, callApi } = await rainfallCard();
+    callApi.mockImplementation(() => new Promise(() => undefined));
+    card.setConfig({ ...card.config, rainfall_rate_entity: "sensor.pending" });
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-placeholder")?.textContent).toContain("Loading rain history");
+    callApi.mockResolvedValue([]);
+    card.setConfig({ ...card.config, rainfall_rate_entity: "sensor.empty" });
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-placeholder")?.textContent).toContain("No usable rain history");
+    callApi.mockResolvedValue([[{ state: "0", last_changed: "2026-10-06T12:00:00Z", attributes: { unit_of_measurement: "mm/h" } }]]);
+    card.setConfig({ ...card.config, rainfall_rate_entity: "sensor.rate" });
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-plot path")?.getAttribute("d")).toContain("M0,74.00 H10");
+    expect(card.shadowRoot?.querySelector(".rainfall-caption")?.textContent).toContain("Peak rate: 0 mm/h");
+    card.hass = { ...card.hass!, callApi: undefined };
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall-placeholder")?.textContent).toContain("Rain history unavailable");
+    expect(card.shadowRoot?.querySelector(".temperature")?.textContent).toContain("18");
+  });
+
+  it("does not fetch on unrelated hass updates and cleans up through disconnect/reconnect", async () => {
+    const { card, callApi } = await rainfallCard();
+    card.hass = { ...card.hass!, states: { ...card.hass!.states } };
+    await card.updateComplete;
+    expect(callApi).toHaveBeenCalledOnce();
+    card.remove();
+    await vi.advanceTimersByTimeAsync(600_000);
+    expect(callApi).toHaveBeenCalledOnce();
+    document.body.append(card);
+    await card.updateComplete;
+    await card.updateComplete;
+    expect(callApi).toHaveBeenCalledTimes(2);
+  });
+
+  it("supports state-only, totals-only and unmapped configurations without requesting history", async () => {
+    const { card, callApi } = await rainfallCard({ rainfall_rate_entity: undefined, rainfall_today_entity: undefined,
+      rainfall_week_entity: undefined, rain_state_entity: "binary_sensor.missing" });
+    expect(callApi).not.toHaveBeenCalled();
+    expect(card.shadowRoot?.querySelector(".rainfall-status")?.textContent).toContain("Rain status unavailable");
+    expect(card.shadowRoot?.querySelectorAll(".rainfall-metric")).toHaveLength(0);
+    card.setConfig({ rainfall_today_entity: "sensor.today" });
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelectorAll(".rainfall-metric")).toHaveLength(1);
+    card.setConfig({});
+    await card.updateComplete;
+    expect(card.shadowRoot?.querySelector(".rainfall")).toBeNull();
+    expect(callApi).not.toHaveBeenCalled();
+    for (const key of ["adaptive_metrics", "show_rainfall_history"] as const) {
+      expect(() => card.setConfig({ [key]: "false" })).toThrow("boolean");
+    }
   });
 });

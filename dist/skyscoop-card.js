@@ -58,23 +58,23 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 		}
 		return n;
 	}
-}, x = (e, t) => !l(e, t), S = {
+}, ee = (e, t) => !l(e, t), x = {
 	attribute: !0,
 	type: String,
 	converter: b,
 	reflect: !1,
 	useDefault: !1,
-	hasChanged: x
+	hasChanged: ee
 };
 Symbol.metadata ??= Symbol("metadata"), h.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-var C = class extends HTMLElement {
+var S = class extends HTMLElement {
 	static addInitializer(e) {
 		this._$Ei(), (this.l ??= []).push(e);
 	}
 	static get observedAttributes() {
 		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
 	}
-	static createProperty(e, t = S) {
+	static createProperty(e, t = x) {
 		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
 			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
 			r !== void 0 && u(this.prototype, e, r);
@@ -100,7 +100,7 @@ var C = class extends HTMLElement {
 		};
 	}
 	static getPropertyOptions(e) {
-		return this.elementProperties.get(e) ?? S;
+		return this.elementProperties.get(e) ?? x;
 	}
 	static _$Ei() {
 		if (this.hasOwnProperty(y("elementProperties"))) return;
@@ -187,7 +187,7 @@ var C = class extends HTMLElement {
 	requestUpdate(e, t, n, r = !1, i) {
 		if (e !== void 0) {
 			let a = this.constructor;
-			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? x)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? ee)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
 			this.C(e, t, n);
 		}
 		!1 === this.isUpdatePending && (this._$ES = this._$EP());
@@ -251,89 +251,89 @@ var C = class extends HTMLElement {
 	updated(e) {}
 	firstUpdated(e) {}
 };
-C.elementStyles = [], C.shadowRootOptions = { mode: "open" }, C[y("elementProperties")] = /* @__PURE__ */ new Map(), C[y("finalized")] = /* @__PURE__ */ new Map(), v?.({ ReactiveElement: C }), (h.reactiveElementVersions ??= []).push("2.1.2");
+S.elementStyles = [], S.shadowRootOptions = { mode: "open" }, S[y("elementProperties")] = /* @__PURE__ */ new Map(), S[y("finalized")] = /* @__PURE__ */ new Map(), v?.({ ReactiveElement: S }), (h.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
-var w = globalThis, T = (e) => e, E = w.trustedTypes, D = E ? E.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ee = "$lit$", O = `lit$${Math.random().toFixed(9).slice(2)}$`, te = "?" + O, ne = `<${te}>`, k = document, A = () => k.createComment(""), j = (e) => e === null || typeof e != "object" && typeof e != "function", M = Array.isArray, re = (e) => M(e) || typeof e?.[Symbol.iterator] == "function", N = "[ 	\n\f\r]", P = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ie = /-->/g, ae = />/g, F = RegExp(`>|${N}(?:([^\\s"'>=/]+)(${N}*=${N}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), oe = /'/g, se = /"/g, I = /^(?:script|style|textarea|title)$/i, L = ((e) => (t, ...n) => ({
+var C = globalThis, te = (e) => e, w = C.trustedTypes, ne = w ? w.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, re = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, E = "?" + T, ie = `<${E}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, oe = /-->/g, se = />/g, N = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), ce = /'/g, P = /"/g, le = /^(?:script|style|textarea|title)$/i, F = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
 	values: n
-}))(1), R = Symbol.for("lit-noChange"), z = Symbol.for("lit-nothing"), B = /* @__PURE__ */ new WeakMap(), V = k.createTreeWalker(k, 129);
-function H(e, t) {
-	if (!M(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-	return D === void 0 ? t : D.createHTML(t);
+}))(1), I = Symbol.for("lit-noChange"), L = Symbol.for("lit-nothing"), ue = /* @__PURE__ */ new WeakMap(), R = D.createTreeWalker(D, 129);
+function de(e, t) {
+	if (!A(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
+	return ne === void 0 ? t : ne.createHTML(t);
 }
-var ce = (e, t) => {
-	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = P;
+var fe = (e, t) => {
+	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = M;
 	for (let t = 0; t < n; t++) {
 		let n = e[t], s, c, l = -1, u = 0;
-		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === P ? c[1] === "!--" ? o = ie : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = F) : (I.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = F) : o = ae : o === F ? c[0] === ">" ? (o = i ?? P, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? F : c[3] === "\"" ? se : oe) : o === se || o === oe ? o = F : o === ie || o === ae ? o = P : (o = F, i = void 0);
-		let d = o === F && e[t + 1].startsWith("/>") ? " " : "";
-		a += o === P ? n + ne : l >= 0 ? (r.push(s), n.slice(0, l) + ee + n.slice(l) + O + d) : n + O + (l === -2 ? t : d);
+		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === M ? c[1] === "!--" ? o = oe : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = N) : (le.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = N) : o = se : o === N ? c[0] === ">" ? (o = i ?? M, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? N : c[3] === "\"" ? P : ce) : o === P || o === ce ? o = N : o === oe || o === se ? o = M : (o = N, i = void 0);
+		let d = o === N && e[t + 1].startsWith("/>") ? " " : "";
+		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + re + n.slice(l) + T + d) : n + T + (l === -2 ? t : d);
 	}
-	return [H(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
-}, U = class e {
+	return [de(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
+}, z = class e {
 	constructor({ strings: t, _$litType$: n }, r) {
 		let i;
 		this.parts = [];
-		let a = 0, o = 0, s = t.length - 1, c = this.parts, [l, u] = ce(t, n);
-		if (this.el = e.createElement(l, r), V.currentNode = this.el.content, n === 2 || n === 3) {
+		let a = 0, o = 0, s = t.length - 1, c = this.parts, [l, u] = fe(t, n);
+		if (this.el = e.createElement(l, r), R.currentNode = this.el.content, n === 2 || n === 3) {
 			let e = this.el.content.firstChild;
 			e.replaceWith(...e.childNodes);
 		}
-		for (; (i = V.nextNode()) !== null && c.length < s;) {
+		for (; (i = R.nextNode()) !== null && c.length < s;) {
 			if (i.nodeType === 1) {
-				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(ee)) {
-					let t = u[o++], n = i.getAttribute(e).split(O), r = /([.?@])?(.*)/.exec(t);
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(re)) {
+					let t = u[o++], n = i.getAttribute(e).split(T), r = /([.?@])?(.*)/.exec(t);
 					c.push({
 						type: 1,
 						index: a,
 						name: r[2],
 						strings: n,
-						ctor: r[1] === "." ? ue : r[1] === "?" ? de : r[1] === "@" ? fe : K
+						ctor: r[1] === "." ? me : r[1] === "?" ? he : r[1] === "@" ? ge : H
 					}), i.removeAttribute(e);
-				} else e.startsWith(O) && (c.push({
+				} else e.startsWith(T) && (c.push({
 					type: 6,
 					index: a
 				}), i.removeAttribute(e));
-				if (I.test(i.tagName)) {
-					let e = i.textContent.split(O), t = e.length - 1;
+				if (le.test(i.tagName)) {
+					let e = i.textContent.split(T), t = e.length - 1;
 					if (t > 0) {
-						i.textContent = E ? E.emptyScript : "";
-						for (let n = 0; n < t; n++) i.append(e[n], A()), V.nextNode(), c.push({
+						i.textContent = w ? w.emptyScript : "";
+						for (let n = 0; n < t; n++) i.append(e[n], O()), R.nextNode(), c.push({
 							type: 2,
 							index: ++a
 						});
-						i.append(e[t], A());
+						i.append(e[t], O());
 					}
 				}
 			} else if (i.nodeType === 8) {
-				if (i.data === te) c.push({
+				if (i.data === E) c.push({
 					type: 2,
 					index: a
 				});
 				else {
 					let e = -1;
-					for (; (e = i.data.indexOf(O, e + 1)) !== -1;) c.push({
+					for (; (e = i.data.indexOf(T, e + 1)) !== -1;) c.push({
 						type: 7,
 						index: a
-					}), e += O.length - 1;
+					}), e += T.length - 1;
 				}
 			}
 			a++;
 		}
 	}
 	static createElement(e, t) {
-		let n = k.createElement("template");
+		let n = D.createElement("template");
 		return n.innerHTML = e, n;
 	}
 };
-function W(e, t, n = e, r) {
-	if (t === R) return t;
-	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = j(t) ? void 0 : t._$litDirective$;
-	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = W(e, i._$AS(e, t.values), i, r)), t;
+function B(e, t, n = e, r) {
+	if (t === I) return t;
+	let i = r === void 0 ? n._$Cl : n._$Co?.[r], a = k(t) ? void 0 : t._$litDirective$;
+	return i?.constructor !== a && (i?._$AO?.(!1), a === void 0 ? i = void 0 : (i = new a(e), i._$AT(e, n, r)), r === void 0 ? n._$Cl = i : (n._$Co ??= [])[r] = i), i !== void 0 && (t = B(e, i._$AS(e, t.values), i, r)), t;
 }
-var le = class {
+var pe = class {
 	constructor(e, t) {
 		this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
 	}
@@ -344,28 +344,28 @@ var le = class {
 		return this._$AM._$AU;
 	}
 	u(e) {
-		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? k).importNode(t, !0);
-		V.currentNode = r;
-		let i = V.nextNode(), a = 0, o = 0, s = n[0];
+		let { el: { content: t }, parts: n } = this._$AD, r = (e?.creationScope ?? D).importNode(t, !0);
+		R.currentNode = r;
+		let i = R.nextNode(), a = 0, o = 0, s = n[0];
 		for (; s !== void 0;) {
 			if (a === s.index) {
 				let t;
-				s.type === 2 ? t = new G(i, i.nextSibling, this, e) : s.type === 1 ? t = new s.ctor(i, s.name, s.strings, this, e) : s.type === 6 && (t = new pe(i, this, e)), this._$AV.push(t), s = n[++o];
+				s.type === 2 ? t = new V(i, i.nextSibling, this, e) : s.type === 1 ? t = new s.ctor(i, s.name, s.strings, this, e) : s.type === 6 && (t = new _e(i, this, e)), this._$AV.push(t), s = n[++o];
 			}
-			a !== s?.index && (i = V.nextNode(), a++);
+			a !== s?.index && (i = R.nextNode(), a++);
 		}
-		return V.currentNode = k, r;
+		return R.currentNode = D, r;
 	}
 	p(e) {
 		let t = 0;
 		for (let n of this._$AV) n !== void 0 && (n.strings === void 0 ? n._$AI(e[t]) : (n._$AI(e, n, t), t += n.strings.length - 2)), t++;
 	}
-}, G = class e {
+}, V = class e {
 	get _$AU() {
 		return this._$AM?._$AU ?? this._$Cv;
 	}
 	constructor(e, t, n, r) {
-		this.type = 2, this._$AH = z, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = n, this.options = r, this._$Cv = r?.isConnected ?? !0;
+		this.type = 2, this._$AH = L, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = n, this.options = r, this._$Cv = r?.isConnected ?? !0;
 	}
 	get parentNode() {
 		let e = this._$AA.parentNode, t = this._$AM;
@@ -378,7 +378,7 @@ var le = class {
 		return this._$AB;
 	}
 	_$AI(e, t = this) {
-		e = W(this, e, t), j(e) ? e === z || e == null || e === "" ? (this._$AH !== z && this._$AR(), this._$AH = z) : e !== this._$AH && e !== R && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? re(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
+		e = B(this, e, t), k(e) ? e === L || e == null || e === "" ? (this._$AH !== L && this._$AR(), this._$AH = L) : e !== this._$AH && e !== I && this._(e) : e._$litType$ === void 0 ? e.nodeType === void 0 ? ae(e) ? this.k(e) : this._(e) : this.T(e) : this.$(e);
 	}
 	O(e) {
 		return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -387,36 +387,36 @@ var le = class {
 		this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
 	}
 	_(e) {
-		this._$AH !== z && j(this._$AH) ? this._$AA.nextSibling.data = e : this.T(k.createTextNode(e)), this._$AH = e;
+		this._$AH !== L && k(this._$AH) ? this._$AA.nextSibling.data = e : this.T(D.createTextNode(e)), this._$AH = e;
 	}
 	$(e) {
-		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = U.createElement(H(n.h, n.h[0]), this.options)), n);
+		let { values: t, _$litType$: n } = e, r = typeof n == "number" ? this._$AC(e) : (n.el === void 0 && (n.el = z.createElement(de(n.h, n.h[0]), this.options)), n);
 		if (this._$AH?._$AD === r) this._$AH.p(t);
 		else {
-			let e = new le(r, this), n = e.u(this.options);
+			let e = new pe(r, this), n = e.u(this.options);
 			e.p(t), this.T(n), this._$AH = e;
 		}
 	}
 	_$AC(e) {
-		let t = B.get(e.strings);
-		return t === void 0 && B.set(e.strings, t = new U(e)), t;
+		let t = ue.get(e.strings);
+		return t === void 0 && ue.set(e.strings, t = new z(e)), t;
 	}
 	k(t) {
-		M(this._$AH) || (this._$AH = [], this._$AR());
+		A(this._$AH) || (this._$AH = [], this._$AR());
 		let n = this._$AH, r, i = 0;
-		for (let a of t) i === n.length ? n.push(r = new e(this.O(A()), this.O(A()), this, this.options)) : r = n[i], r._$AI(a), i++;
+		for (let a of t) i === n.length ? n.push(r = new e(this.O(O()), this.O(O()), this, this.options)) : r = n[i], r._$AI(a), i++;
 		i < n.length && (this._$AR(r && r._$AB.nextSibling, i), n.length = i);
 	}
 	_$AR(e = this._$AA.nextSibling, t) {
 		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
-			let t = T(e).nextSibling;
-			T(e).remove(), e = t;
+			let t = te(e).nextSibling;
+			te(e).remove(), e = t;
 		}
 	}
 	setConnected(e) {
 		this._$AM === void 0 && (this._$Cv = e, this._$AP?.(e));
 	}
-}, K = class {
+}, H = class {
 	get tagName() {
 		return this.element.tagName;
 	}
@@ -424,47 +424,47 @@ var le = class {
 		return this._$AM._$AU;
 	}
 	constructor(e, t, n, r, i) {
-		this.type = 1, this._$AH = z, this._$AN = void 0, this.element = e, this.name = t, this._$AM = r, this.options = i, n.length > 2 || n[0] !== "" || n[1] !== "" ? (this._$AH = Array(n.length - 1).fill(/* @__PURE__ */ new String()), this.strings = n) : this._$AH = z;
+		this.type = 1, this._$AH = L, this._$AN = void 0, this.element = e, this.name = t, this._$AM = r, this.options = i, n.length > 2 || n[0] !== "" || n[1] !== "" ? (this._$AH = Array(n.length - 1).fill(/* @__PURE__ */ new String()), this.strings = n) : this._$AH = L;
 	}
 	_$AI(e, t = this, n, r) {
 		let i = this.strings, a = !1;
-		if (i === void 0) e = W(this, e, t, 0), a = !j(e) || e !== this._$AH && e !== R, a && (this._$AH = e);
+		if (i === void 0) e = B(this, e, t, 0), a = !k(e) || e !== this._$AH && e !== I, a && (this._$AH = e);
 		else {
 			let r = e, o, s;
-			for (e = i[0], o = 0; o < i.length - 1; o++) s = W(this, r[n + o], t, o), s === R && (s = this._$AH[o]), a ||= !j(s) || s !== this._$AH[o], s === z ? e = z : e !== z && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
+			for (e = i[0], o = 0; o < i.length - 1; o++) s = B(this, r[n + o], t, o), s === I && (s = this._$AH[o]), a ||= !k(s) || s !== this._$AH[o], s === L ? e = L : e !== L && (e += (s ?? "") + i[o + 1]), this._$AH[o] = s;
 		}
 		a && !r && this.j(e);
 	}
 	j(e) {
-		e === z ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+		e === L ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
 	}
-}, ue = class extends K {
+}, me = class extends H {
 	constructor() {
 		super(...arguments), this.type = 3;
 	}
 	j(e) {
-		this.element[this.name] = e === z ? void 0 : e;
+		this.element[this.name] = e === L ? void 0 : e;
 	}
-}, de = class extends K {
+}, he = class extends H {
 	constructor() {
 		super(...arguments), this.type = 4;
 	}
 	j(e) {
-		this.element.toggleAttribute(this.name, !!e && e !== z);
+		this.element.toggleAttribute(this.name, !!e && e !== L);
 	}
-}, fe = class extends K {
+}, ge = class extends H {
 	constructor(e, t, n, r, i) {
 		super(e, t, n, r, i), this.type = 5;
 	}
 	_$AI(e, t = this) {
-		if ((e = W(this, e, t, 0) ?? z) === R) return;
-		let n = this._$AH, r = e === z && n !== z || e.capture !== n.capture || e.once !== n.once || e.passive !== n.passive, i = e !== z && (n === z || r);
+		if ((e = B(this, e, t, 0) ?? L) === I) return;
+		let n = this._$AH, r = e === L && n !== L || e.capture !== n.capture || e.once !== n.once || e.passive !== n.passive, i = e !== L && (n === L || r);
 		r && this.element.removeEventListener(this.name, this, n), i && this.element.addEventListener(this.name, this, e), this._$AH = e;
 	}
 	handleEvent(e) {
 		typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, e) : this._$AH.handleEvent(e);
 	}
-}, pe = class {
+}, _e = class {
 	constructor(e, t, n) {
 		this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = n;
 	}
@@ -472,18 +472,18 @@ var le = class {
 		return this._$AM._$AU;
 	}
 	_$AI(e) {
-		W(this, e);
+		B(this, e);
 	}
-}, me = w.litHtmlPolyfillSupport;
-me?.(U, G), (w.litHtmlVersions ??= []).push("3.3.3");
-var he = (e, t, n) => {
+}, ve = C.litHtmlPolyfillSupport;
+ve?.(z, V), (C.litHtmlVersions ??= []).push("3.3.3");
+var ye = (e, t, n) => {
 	let r = n?.renderBefore ?? t, i = r._$litPart$;
 	if (i === void 0) {
 		let e = n?.renderBefore ?? null;
-		r._$litPart$ = i = new G(t.insertBefore(A(), e), e, void 0, n ?? {});
+		r._$litPart$ = i = new V(t.insertBefore(O(), e), e, void 0, n ?? {});
 	}
 	return i._$AI(e), i;
-}, q = globalThis, J = class extends C {
+}, U = globalThis, W = class extends S {
 	constructor() {
 		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
 	}
@@ -493,7 +493,7 @@ var he = (e, t, n) => {
 	}
 	update(e) {
 		let t = this.render();
-		this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = he(t, this.renderRoot, this.renderOptions);
+		this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = ye(t, this.renderRoot, this.renderOptions);
 	}
 	connectedCallback() {
 		super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -502,15 +502,15 @@ var he = (e, t, n) => {
 		super.disconnectedCallback(), this._$Do?.setConnected(!1);
 	}
 	render() {
-		return R;
+		return I;
 	}
 };
-J._$litElement$ = !0, J.finalized = !0, q.litElementHydrateSupport?.({ LitElement: J });
-var ge = q.litElementPolyfillSupport;
-ge?.({ LitElement: J }), (q.litElementVersions ??= []).push("4.2.2");
+W._$litElement$ = !0, W.finalized = !0, U.litElementHydrateSupport?.({ LitElement: W });
+var be = U.litElementPolyfillSupport;
+be?.({ LitElement: W }), (U.litElementVersions ??= []).push("4.2.2");
 //#endregion
 //#region src/station.ts
-var _e = [
+var xe = [
 	{
 		key: "humidity_entity",
 		label: "humidity",
@@ -561,22 +561,22 @@ var _e = [
 		maximum: Infinity
 	}
 ];
-function Y(e) {
+function G(e) {
 	if (typeof e != "number" && typeof e != "string" || typeof e == "string" && !e.trim()) return;
 	let t = Number(e);
 	return Number.isFinite(t) ? t : void 0;
 }
-function ve(e, t) {
+function K(e, t) {
 	let n = t ? e?.states[t] : void 0;
 	return {
-		value: Y(n?.state),
+		value: G(n?.state),
 		unit: typeof n?.attributes.unit_of_measurement == "string" ? n.attributes.unit_of_measurement : ""
 	};
 }
-function ye(e, t) {
-	return _e.flatMap((n) => {
+function q(e, t) {
+	return xe.flatMap((n) => {
 		if (!t?.[n.key]) return [];
-		let r = ve(e, t[n.key]), i = r.value !== void 0 && r.value >= n.minimum && r.value <= n.maximum ? r.value : void 0;
+		let r = K(e, t[n.key]), i = r.value !== void 0 && r.value >= n.minimum && r.value <= n.maximum ? r.value : void 0;
 		return [{
 			...n,
 			...r,
@@ -586,15 +586,15 @@ function ye(e, t) {
 }
 //#endregion
 //#region src/forecast.ts
-function be(e, t, n) {
+function Se(e, t, n) {
 	let r = t.getTime();
 	if (!Number.isFinite(r) || n <= 0) return [];
 	let i = /* @__PURE__ */ new Map();
 	for (let t of e ?? []) {
 		if (!t || typeof t.datetime != "string") continue;
-		let e = Date.parse(t.datetime), n = Y(t.temperature);
+		let e = Date.parse(t.datetime), n = G(t.temperature);
 		if (!Number.isFinite(e) || e < r || e >= r + 864e5 || n === void 0) continue;
-		let a = Y(t.precipitation_probability);
+		let a = G(t.precipitation_probability);
 		i.has(e) || i.set(e, {
 			timestamp: e,
 			temperature: n,
@@ -604,7 +604,7 @@ function be(e, t, n) {
 	}
 	return [...i.values()].sort((e, t) => e.timestamp - t.timestamp).slice(0, n);
 }
-function xe(e, t) {
+function Ce(e, t) {
 	try {
 		let n = new Intl.DateTimeFormat("en-CA", {
 			timeZone: t,
@@ -617,7 +617,7 @@ function xe(e, t) {
 		return;
 	}
 }
-function Se(e, t) {
+function we(e, t) {
 	try {
 		let n = new Intl.DateTimeFormat("en", {
 			timeZone: t,
@@ -629,33 +629,33 @@ function Se(e, t) {
 		return;
 	}
 }
-function X(e) {
+function J(e) {
 	if (typeof e != "number" && typeof e != "string" || typeof e == "string" && e.trim() === "") return;
 	let t = Number(e);
 	return Number.isFinite(t) ? t : void 0;
 }
-function Ce(e, t, n = "UTC") {
+function Te(e, t, n = "UTC") {
 	if (!e?.length || !Number.isFinite(t.getTime())) return;
-	let r = xe(t, n);
+	let r = Ce(t, n);
 	if (!r) return;
 	let i = e.flatMap((e) => {
 		if (typeof e.datetime != "string") return [];
 		let t = new Date(e.datetime);
-		return !Number.isFinite(t.getTime()) || xe(t, n) !== r ? [] : [{
+		return !Number.isFinite(t.getTime()) || Ce(t, n) !== r ? [] : [{
 			period: e,
 			timestamp: t
 		}];
 	});
 	if (!i.length) return;
 	let a = i.find(({ period: e }) => e.is_daytime === !0), o = i.find(({ period: e }) => e.is_daytime === !1), s = o?.timestamp;
-	if (s ? t.getTime() >= s.getTime() : (Se(t, n) ?? 0) >= 17) {
-		let e = X(o?.period.temperature) ?? X(a?.period.templow) ?? X(i[0].period.templow) ?? X(o?.period.templow);
+	if (s ? t.getTime() >= s.getTime() : (we(t, n) ?? 0) >= 17) {
+		let e = J(o?.period.temperature) ?? J(a?.period.templow) ?? J(i[0].period.templow) ?? J(o?.period.templow);
 		return e === void 0 ? void 0 : {
 			kind: "low",
 			temperature: e
 		};
 	}
-	let c = X(a?.period.temperature) ?? X(i[0].period.temperature);
+	let c = J(a?.period.temperature) ?? J(i[0].period.temperature);
 	return c === void 0 ? void 0 : {
 		kind: "high",
 		temperature: c
@@ -663,7 +663,7 @@ function Ce(e, t, n = "UTC") {
 }
 //#endregion
 //#region src/localization.ts
-var we = { en: {
+var Ee = { en: {
 	temperature: "Outdoor temperature",
 	cardHeader: "Card header (optional)",
 	unavailable: "Unavailable",
@@ -676,6 +676,25 @@ var we = { en: {
 	windDirection: "Wind direction (from)",
 	uvIndex: "UV index",
 	illuminance: "Illuminance",
+	rainfall: "Rainfall",
+	rainfallRate: "Rain rate",
+	rainfallToday: "Rain today",
+	rainfallWeek: "Rain this week",
+	rainStateEntity: "Rain-state binary sensor",
+	wet: "Raining",
+	dry: "Dry",
+	unknown: "Rain status unavailable",
+	heavyRain: "Heavy rain",
+	rainfallHistory: "Rain rate: hourly peaks (24 h)",
+	rainfallHistoryLoading: "Loading rain history",
+	rainfallHistoryEmpty: "No usable rain history",
+	rainfallHistoryError: "Rain history unavailable",
+	rainfallHistoryStale: "History stale; last loaded",
+	peakRate: "Peak rate",
+	adaptiveMetrics: "Adaptive metric emphasis",
+	showRainfallHistory: "Rain-rate history",
+	strongWind: "Strong wind",
+	highUv: "High UV",
 	stationMetrics: "Optional station sensors",
 	hourlyForecast: "Hourly forecast",
 	hourlyLoading: "Loading hourly forecast",
@@ -722,13 +741,13 @@ var we = { en: {
 	forecastUnavailable: "Forecast unavailable",
 	weatherEntity: "Weather entity"
 } };
-function Z(e, t) {
+function Y(e, t) {
 	let n = e?.toLowerCase().split("-")[0];
-	return we[n && n in we ? n : "en"][t];
+	return Ee[n && n in Ee ? n : "en"][t];
 }
 //#endregion
 //#region src/compass.ts
-var Te = [
+var De = [
 	"N",
 	"NNE",
 	"NE",
@@ -746,28 +765,29 @@ var Te = [
 	"NW",
 	"NNW"
 ];
-function Ee(e) {
+function Oe(e) {
 	return Number.isFinite(e) ? (e % 360 + 360) % 360 : void 0;
 }
-function De(e, t = 16) {
-	let n = Ee(e);
+function ke(e, t = 16) {
+	let n = Oe(e);
 	if (n === void 0) return;
 	let r = Math.round(n / (360 / t)) % t;
-	return Te[16 / t * r];
+	return De[16 / t * r];
 }
 //#endregion
 //#region src/station-metrics.ts
-function Oe(e, t, n) {
+function Ae(e, t, n, r = {}) {
 	if (!e.length) return "";
-	let r = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
-	return L`
-    <section class="station-metrics" aria-label=${Z(t, "stationMetrics")}>
+	let i = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
+	return F`
+    <section class="station-metrics" aria-label=${Y(t, "stationMetrics")}>
       ${e.map((e) => {
-		let i = e.key === "wind_direction_entity" && e.value !== void 0 ? De(e.value, n === "compact" ? 8 : 16) : void 0, a = e.value === void 0 ? Z(t, "unavailable") : i ? `${Z(t, i)} (${r.format(Ee(e.value))}°)` : `${r.format(e.value)} ${e.unit}`;
-		return L`
-          <div class="metric" data-metric=${e.key}>
-            <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Z(t, e.label)}</div>
-            <div class="metric-value">${a}</div>
+		let a = e.key === "wind_direction_entity" && e.value !== void 0 ? ke(e.value, n === "compact" ? 8 : 16) : void 0, o = e.value === void 0 ? Y(t, "unavailable") : a ? `${Y(t, a)} (${i.format(Oe(e.value))}°)` : `${i.format(e.value)} ${e.unit}`, s = r[e.key], c = e.key.startsWith("wind_") || e.key === "uv_index_entity";
+		return F`
+          <div class="metric" data-metric=${e.key} data-emphasis=${s ?? "none"}>
+            <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(t, e.label)}</div>
+            <div class="metric-value">${o}</div>
+            ${c ? F`<div class="metric-reason">${s ? Y(t, s) : ""}</div>` : ""}
           </div>
         `;
 	})}
@@ -776,7 +796,7 @@ function Oe(e, t, n) {
 }
 //#endregion
 //#region src/forecast-stream.ts
-var ke = class {
+var je = class {
 	constructor(e) {
 		this.changed = e, this.status = "idle", this.generation = 0;
 	}
@@ -807,21 +827,21 @@ var ke = class {
 			this.key = void 0, this.connection = void 0, this.forecast = void 0, this.status = "error", this.changed();
 		}
 	}
-}, Ae = {
+}, Me = {
 	compact: 4,
 	standard: 8,
 	wide: 12
-}, je = {
+}, X = {
 	compact: 2,
 	standard: 3,
 	wide: 4
 };
-function Me(e, t = "auto") {
+function Ne(e, t = "auto") {
 	return t === "auto" ? !Number.isFinite(e) || e <= 0 ? "standard" : e < 360 ? "compact" : e < 600 ? "standard" : "wide" : t;
 }
 //#endregion
 //#region src/hourly-forecast.ts
-var Q = {
+var Z = {
 	"clear-night": "mdi:weather-night",
 	cloudy: "mdi:weather-cloudy",
 	fog: "mdi:weather-fog",
@@ -838,7 +858,7 @@ var Q = {
 	"windy-variant": "mdi:weather-windy-variant",
 	exceptional: "mdi:alert-circle-outline"
 };
-function Ne(e, t, n, r) {
+function Pe(e, t, n, r) {
 	let i;
 	try {
 		i = new Intl.DateTimeFormat(t || "en", {
@@ -854,15 +874,15 @@ function Ne(e, t, n, r) {
 		});
 	}
 	let a = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
-	return L`
-    <div class="hourly-strip" role="list" tabindex="0" aria-label=${Z(t, "hourlyForecast")}>
-      ${e.map((e) => L`
+	return F`
+    <div class="hourly-strip" role="list" tabindex="0" aria-label=${Y(t, "hourlyForecast")}>
+      ${e.map((e) => F`
         <div class="hourly-period" role="listitem">
           <time datetime=${new Date(e.timestamp).toISOString()}>${i.format(e.timestamp)}</time>
-          ${e.condition && Object.hasOwn(Q, e.condition) ? L`<ha-icon .icon=${Q[e.condition]} role="img" aria-label=${Z(t, e.condition)}></ha-icon>` : ""}
+          ${e.condition && Object.hasOwn(Z, e.condition) ? F`<ha-icon .icon=${Z[e.condition]} role="img" aria-label=${Y(t, e.condition)}></ha-icon>` : ""}
           <div class="hourly-temperature">${a.format(e.temperature)} ${r}</div>
-          ${e.probability === void 0 ? "" : L`
-            <div class="hourly-probability" aria-label=${`${Z(t, "precipitationProbability")}: ${a.format(e.probability)}%`}>
+          ${e.probability === void 0 ? "" : F`
+            <div class="hourly-probability" aria-label=${`${Y(t, "precipitationProbability")}: ${a.format(e.probability)}%`}>
               <ha-icon icon="mdi:water" aria-hidden="true"></ha-icon>${a.format(e.probability)}%
             </div>`}
         </div>
@@ -871,8 +891,191 @@ function Ne(e, t, n, r) {
   `;
 }
 //#endregion
+//#region src/rainfall.ts
+var Fe = [
+	{
+		key: "rainfall_rate_entity",
+		label: "rainfallRate",
+		icon: "mdi:weather-pouring"
+	},
+	{
+		key: "rainfall_today_entity",
+		label: "rainfallToday",
+		icon: "mdi:water"
+	},
+	{
+		key: "rainfall_week_entity",
+		label: "rainfallWeek",
+		icon: "mdi:calendar-week"
+	}
+], Q = 36e5;
+function Ie(e, t) {
+	return Fe.flatMap((n) => {
+		if (!t?.[n.key]) return [];
+		let r = K(e, t[n.key]);
+		return [{
+			...n,
+			...r,
+			value: r.value !== void 0 && r.value >= 0 ? r.value : void 0
+		}];
+	});
+}
+function Le(e, t) {
+	let n = t?.rain_state_entity ? e?.states[t.rain_state_entity]?.state : void 0;
+	if (n === "on") return "wet";
+	if (n === "off") return "dry";
+	let r = K(e, t?.rainfall_rate_entity).value;
+	return r !== void 0 && r >= 0 ? r > 0 ? "wet" : "dry" : "unknown";
+}
+function Re(e, t, n, r = t) {
+	let i = t - 24 * Q, a = Array.from({ length: 24 }, (e, t) => ({
+		start: i + t * Q,
+		coverage: 0,
+		peak: 0
+	})), o = /* @__PURE__ */ new Map();
+	for (let n of e) {
+		let e = n.last_updated ?? n.last_changed, i = typeof e == "string" ? Date.parse(e) : NaN;
+		Number.isFinite(i) && i < Math.min(t, r) && o.set(i, n);
+	}
+	let s = [...o.entries()].sort(([e], [t]) => e - t);
+	for (let e = 0; e < s.length; e += 1) {
+		let [o, c] = s[e], l = G(c.state);
+		if (l === void 0 || l < 0 || !n || c.attributes?.unit_of_measurement !== n) continue;
+		let u = Math.max(o, i), d = Math.min(s[e + 1]?.[0] ?? r, t, r);
+		for (let e of a) {
+			let t = Math.min(d, e.start + Q) - Math.max(u, e.start);
+			t > 0 && (e.coverage += t, e.peak = Math.max(e.peak, l));
+		}
+	}
+	return a.map((e) => ({
+		start: e.start,
+		peak: e.coverage === 36e5 ? e.peak : void 0
+	}));
+}
+//#endregion
+//#region src/rainfall-history.ts
+var ze = class {
+	constructor(e) {
+		this.changed = e, this.records = [], this.status = "idle", this.generation = 0, this.pending = !1;
+	}
+	stop() {
+		this.generation += 1, this.timer && clearInterval(this.timer), this.timer = void 0, this.hass = void 0, this.entityId = void 0, this.pending = !1, this.records = [], this.fetchedAt = void 0, this.status = "idle";
+	}
+	sync(e, t) {
+		if (!e || !t) {
+			this.entityId && (this.stop(), this.changed());
+			return;
+		}
+		if (t === this.entityId && e.connection === this.hass?.connection && e.callApi === this.hass?.callApi) {
+			this.hass = e;
+			return;
+		}
+		this.stop(), this.hass = e, this.entityId = t, this.timer = setInterval(() => void this.fetch(), 3e5), this.fetch();
+	}
+	async fetch() {
+		if (this.pending || !this.hass || !this.entityId) return;
+		let e = this.generation, t = Date.now();
+		this.pending = !0, this.fetchedAt === void 0 && (this.status = "loading"), this.changed();
+		try {
+			if (!this.hass.callApi) throw Error("History API unavailable");
+			let n = new URLSearchParams({
+				filter_entity_id: this.entityId,
+				end_time: new Date(t).toISOString()
+			}), r = `history/period/${encodeURIComponent((/* @__PURE__ */ new Date(t - 24 * Q)).toISOString())}?${n}`, i = await this.hass.callApi("GET", r);
+			if (e !== this.generation) return;
+			if (!Array.isArray(i) || i.length && !Array.isArray(i[0])) throw Error("Invalid history response");
+			let a = i[0] ?? [];
+			this.records = a.filter((e) => typeof e == "object" && !!e && !Array.isArray(e)), this.fetchedAt = t, this.status = this.records.length ? "ready" : "empty";
+		} catch {
+			if (e !== this.generation) return;
+			this.status = "error";
+		} finally {
+			e === this.generation && (this.pending = !1, this.changed());
+		}
+	}
+}, Be = {
+	"m/s": 1,
+	"km/h": 1 / 3.6,
+	mph: .44704,
+	kn: .5144444444444445,
+	knots: .5144444444444445
+}, Ve = {
+	"mm/h": 1,
+	"in/h": 25.4
+};
+function He(e, t, n) {
+	let r = Object.hasOwn(n, e.unit) ? n[e.unit] : void 0;
+	return r !== void 0 && e.value !== void 0 && e.value >= t / r;
+}
+function Ue(e, t) {
+	let n = {}, r = Le(e, t), i = r === "wet" && He(K(e, t?.rainfall_rate_entity), 7.5, Ve);
+	if (t?.adaptive_metrics === !1) return {
+		metrics: n,
+		rain: r,
+		heavyRain: i,
+		rainfall: "none"
+	};
+	let a = [t?.wind_speed_entity, t?.wind_gust_entity].some((t) => He(K(e, t), 8, Be));
+	for (let r of q(e, t)) r.value !== void 0 && (a && r.key.startsWith("wind_") && (n[r.key] = "strongWind"), r.key === "uv_index_entity" && r.value >= 6 && (n[r.key] = "highUv"));
+	return {
+		metrics: n,
+		rain: r,
+		heavyRain: i,
+		rainfall: r === "wet" ? i ? "heavy" : "wet" : "none"
+	};
+}
+//#endregion
+//#region src/rainfall-section.ts
+function We(e, t, n, r, i) {
+	let a = Ie(e, t);
+	if (!a.length && !t?.rain_state_entity) return "";
+	let o = e?.language, s = new Intl.NumberFormat(o || "en", { maximumFractionDigits: 2 }), c = new Intl.DateTimeFormat(o || "en", {
+		timeZone: i,
+		month: "short",
+		day: "numeric",
+		hour: "numeric",
+		minute: "2-digit",
+		timeZoneName: "short"
+	}), l = K(e, t?.rainfall_rate_entity).unit, u = n.status === "error" && n.fetchedAt !== void 0, d = u ? Date.now() : n.fetchedAt ?? Date.now(), f = Re(n.records, d, l, n.fetchedAt ?? d), p = f.flatMap((e) => e.peak === void 0 ? [] : [e.peak]), m = p.length ? Math.max(...p) : void 0, h = Math.max(m ?? 0, 1), g = f.map((e, t) => {
+		if (e.peak === void 0) return "";
+		let n = (74 - e.peak / h * 64).toFixed(2);
+		return `${t && f[t - 1].peak !== void 0 ? "L" : "M"}${t * 10},${n} H${(t + 1) * 10}`;
+	}).join(" "), _ = m === void 0 ? "" : `${Y(o, "peakRate")}: ${s.format(m)} ${l}`, v = `${c.format(d - 24 * Q)} - ${c.format(d)}`, y = r.heavyRain ? "heavyRain" : r.rain, b = n.status === "loading" || n.status === "idle" ? "rainfallHistoryLoading" : n.status === "error" ? "rainfallHistoryError" : "rainfallHistoryEmpty";
+	return F`
+    <section class="rainfall" data-emphasis=${r.rainfall} aria-label=${Y(o, "rainfall")}>
+      <div class="rainfall-heading">
+        <div class="label">${Y(o, "rainfall")}</div>
+        <div class="rainfall-status"><ha-icon icon="mdi:weather-pouring" aria-hidden="true"></ha-icon>${Y(o, y)}</div>
+      </div>
+      ${a.length ? F`
+        <div class="rainfall-metrics">
+          ${a.map((e) => F`
+            <div class="rainfall-metric" data-rainfall=${e.key}>
+              <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(o, e.label)}</div>
+              <div class="metric-value">${e.value === void 0 ? Y(o, "unavailable") : `${s.format(e.value)} ${e.unit}`}</div>
+            </div>
+          `)}
+        </div>
+      ` : ""}
+      ${t?.rainfall_rate_entity && t.show_rainfall_history !== !1 ? F`
+        <div class="rainfall-history">
+          <div class="label">${Y(o, "rainfallHistory")}</div>
+          ${m === void 0 ? F`<div class="rainfall-placeholder" role="status">${Y(o, b)}</div>` : F`
+            <svg class="rainfall-plot" viewBox="0 0 240 80" preserveAspectRatio="none" role="img"
+              aria-label=${`${Y(o, "rainfallHistory")}. ${v}. ${_}`}>
+              <path d=${g} fill="none" vector-effect="non-scaling-stroke"></path>
+            </svg>
+          `}
+          <div class="rainfall-caption"><span>${_}</span><span>${v}</span></div>
+          <div class="rainfall-history-status" role="status">${u ? `${Y(o, "rainfallHistoryStale")} ${c.format(n.fetchedAt)}` : ""}</div>
+        </div>
+      ` : ""}
+    </section>
+  `;
+}
+//#endregion
 //#region src/skyscoop-card.ts
-var $ = "skyscoop-card", Pe = {
+var $ = "skyscoop-card", Ge = {
 	"clear-night": "neutral",
 	cloudy: "neutral",
 	fog: "neutral",
@@ -888,9 +1091,9 @@ var $ = "skyscoop-card", Pe = {
 	windy: "neutral",
 	"windy-variant": "neutral",
 	exceptional: "storm"
-}, Fe = class extends J {
+}, Ke = class extends W {
 	constructor(...e) {
-		super(...e), this.summaryStream = new ke(() => this.requestUpdate()), this.hourlyStream = new ke(() => this.requestUpdate()), this.widthLayout = "standard";
+		super(...e), this.summaryStream = new je(() => this.requestUpdate()), this.hourlyStream = new je(() => this.requestUpdate()), this.rainfallHistory = new ze(() => this.requestUpdate()), this.widthLayout = "standard";
 	}
 	static {
 		this.properties = {
@@ -1029,6 +1232,25 @@ var $ = "skyscoop-card", Pe = {
     .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; line-height: 1.3; }
     .metric-value { margin-top: 6px; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
     .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
+    .metric-reason { min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
+    .metric[data-emphasis="strongWind"] .metric-value, .metric[data-emphasis="highUv"] .metric-value { font-weight: 700; }
+    .metric[data-emphasis="strongWind"] ha-icon, .metric[data-emphasis="highUv"] ha-icon { color: var(--skyscoop-accent); }
+    .rainfall { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
+    .rainfall-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: center; gap: 8px; min-height: 2.5rem; }
+    .rainfall-status { display: flex; justify-content: end; align-items: center; gap: 6px; font-size: 0.8125rem; overflow-wrap: anywhere; }
+    .rainfall ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); flex-shrink: 0; }
+    .rainfall[data-emphasis="wet"] .rainfall-status, .rainfall[data-emphasis="heavy"] .rainfall-status { font-weight: 700; }
+    .rainfall[data-emphasis="wet"] .rainfall-status ha-icon, .rainfall[data-emphasis="heavy"] .rainfall-status ha-icon { color: var(--skyscoop-accent); }
+    .rainfall[data-emphasis="heavy"] .rainfall-status { text-decoration: underline; text-underline-offset: 3px; }
+    .rainfall-metrics { display: grid; grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr)); gap: 12px 16px; margin-top: 8px; }
+    .rainfall-metric { min-width: 0; overflow-wrap: anywhere; }
+    .rainfall-metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; }
+    .rainfall-history { min-width: 0; margin-top: 16px; }
+    .rainfall-plot { display: block; width: 100%; height: 88px; margin-block: 8px; overflow: visible; }
+    .rainfall-plot path { stroke: var(--skyscoop-accent); stroke-width: 2; }
+    .rainfall-placeholder { display: grid; align-items: center; height: 88px; margin-block: 8px; color: var(--skyscoop-muted); font-size: 0.8125rem; }
+    .rainfall-caption { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-height: 2.75rem; font-size: 0.75rem; color: var(--skyscoop-muted); overflow-wrap: anywhere; }
+    .rainfall-history-status { min-height: 1.1rem; font-size: 0.75rem; color: var(--skyscoop-muted); overflow-wrap: anywhere; }
     .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
     .hourly > .label { font-weight: 500; }
     .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 0; margin-top: 12px; padding: 8px 0; border-block: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); }
@@ -1041,22 +1263,22 @@ var $ = "skyscoop-card", Pe = {
     .hourly-probability { grid-row: 4; }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
-    @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @container (max-width: 359px) { .station-metrics, .rainfall-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @container (max-width: 359px) { .temperature-row.has-temperature.has-forecast { grid-template-columns: minmax(0, 1fr); } .forecast-summary { border-inline-start: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding: 12px 0 0; } }
-    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
+    @container (max-width: 220px) { .station-metrics, .rainfall-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
   `;
 	}
 	connectedCallback() {
 		super.connectedCallback(), typeof ResizeObserver < "u" && (this.resizeObserver = new ResizeObserver((e) => {
 			let t = e[0]?.contentRect.width;
-			t && t > 0 && (this.widthLayout = Me(t));
-		}), this.resizeObserver.observe(this)), this.hasUpdated && (this.syncForecastSubscription(), this.syncSummaryTimer());
+			t && t > 0 && (this.widthLayout = Ne(t));
+		}), this.resizeObserver.observe(this)), this.hasUpdated && (this.syncForecastSubscription(), this.syncRainfallHistory(), this.syncSummaryTimer());
 	}
 	disconnectedCallback() {
-		super.disconnectedCallback(), this.clearSummaryTimer(), this.summaryStream.stop(), this.hourlyStream.stop(), this.resizeObserver?.disconnect(), this.resizeObserver = void 0;
+		super.disconnectedCallback(), this.clearSummaryTimer(), this.summaryStream.stop(), this.hourlyStream.stop(), this.rainfallHistory.stop(), this.resizeObserver?.disconnect(), this.resizeObserver = void 0;
 	}
 	updated(e) {
-		super.updated(e), (e.has("hass") || e.has("config")) && (this.syncForecastSubscription(), this.syncSummaryTimer());
+		super.updated(e), (e.has("hass") || e.has("config")) && (this.syncForecastSubscription(), this.syncRainfallHistory(), this.syncSummaryTimer());
 	}
 	setConfig(e) {
 		if (!e || typeof e != "object") throw Error("SkyScoop requires an object configuration.");
@@ -1066,12 +1288,22 @@ var $ = "skyscoop-card", Pe = {
 			"standard",
 			"wide"
 		].includes(e.layout)) throw Error("SkyScoop layout must be auto, compact, standard, or wide.");
-		if (e.show_hourly_forecast !== void 0 && typeof e.show_hourly_forecast != "boolean") throw Error("SkyScoop show_hourly_forecast must be a boolean.");
+		for (let t of [
+			"show_hourly_forecast",
+			"adaptive_metrics",
+			"show_rainfall_history"
+		]) if (e[t] !== void 0 && typeof e[t] != "boolean") throw Error(`SkyScoop ${t} must be a boolean.`);
 		this.config = { ...e };
 	}
 	getCardSize() {
-		let e = this.activeLayout;
-		return 2 + Math.ceil(ye(this.hass, this.config).length / je[e]) + +!!this.config?.weather_entity + (this.hourlyEnabled ? 3 : 0);
+		let e = this.activeLayout, t = Ie(this.hass, this.config).length;
+		return 2 + Math.ceil(q(this.hass, this.config).length / X[e]) + +!!this.config?.weather_entity + (this.hourlyEnabled ? 3 : 0) + (t || this.config?.rain_state_entity ? 1 + Math.ceil(t / X[e]) : 0) + (this.rainfallHistoryEnabled ? 3 : 0);
+	}
+	get rainfallHistoryEnabled() {
+		return !!this.config?.rainfall_rate_entity && this.config?.show_rainfall_history !== !1;
+	}
+	syncRainfallHistory() {
+		this.rainfallHistory.sync(this.isConnected && this.rainfallHistoryEnabled ? this.hass : void 0, this.config?.rainfall_rate_entity);
 	}
 	get activeLayout() {
 		return this.config?.layout && this.config.layout !== "auto" ? this.config.layout : this.widthLayout;
@@ -1092,7 +1324,8 @@ var $ = "skyscoop-card", Pe = {
 		await Promise.all([this.summaryStream.sync(r ? n : void 0, e, this.getForecastType()), this.hourlyStream.sync(r ? n : void 0, e, this.hourlyEnabled ? "hourly" : void 0)]);
 	}
 	syncSummaryTimer() {
-		this.isConnected && this.config?.weather_entity && !this.summaryTimer ? this.summaryTimer = setInterval(() => this.requestUpdate(), 6e4) : (!this.isConnected || !this.config?.weather_entity) && this.summaryTimer && this.clearSummaryTimer();
+		let e = this.isConnected && (this.config?.weather_entity || this.rainfallHistoryEnabled);
+		e && !this.summaryTimer ? this.summaryTimer = setInterval(() => this.requestUpdate(), 6e4) : !e && this.summaryTimer && this.clearSummaryTimer();
 	}
 	clearSummaryTimer() {
 		this.summaryTimer &&= (clearInterval(this.summaryTimer), void 0);
@@ -1104,56 +1337,57 @@ var $ = "skyscoop-card", Pe = {
 		return document.createElement("skyscoop-card-editor");
 	}
 	render() {
-		let e = this.hass?.language, t = this.config?.temperature_entity, n = ve(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Ce(this.summaryStream.forecast, l, c), d = this.activeLayout, f = ye(this.hass, this.config), p = be(this.hourlyStream.forecast, l, Ae[d]), m = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "", h = u?.kind === "low" ? "mdi:thermometer-chevron-down" : u ? "mdi:thermometer-chevron-up" : "mdi:thermometer", g = s && Object.hasOwn(Q, s.state) ? s.state : void 0, _ = g ? Q[g] : "mdi:thermometer", v = g ? Pe[g] : void 0;
-		return L`
-      <ha-card .header=${this.config?.name?.trim() || void 0} data-layout=${d} data-weather-tone=${v} style=${`--metric-columns: ${je[d]}`}>
+		let e = this.hass?.language, t = this.config?.temperature_entity, n = K(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Te(this.summaryStream.forecast, l, c), d = this.activeLayout, f = q(this.hass, this.config), p = Ue(this.hass, this.config), m = Se(this.hourlyStream.forecast, l, Me[d]), h = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "", g = u?.kind === "low" ? "mdi:thermometer-chevron-down" : u ? "mdi:thermometer-chevron-up" : "mdi:thermometer", _ = s && Object.hasOwn(Z, s.state) ? s.state : void 0, v = _ ? Z[_] : "mdi:thermometer", y = _ ? Ge[_] : void 0;
+		return F`
+      <ha-card .header=${this.config?.name?.trim() || void 0} data-layout=${d} data-weather-tone=${y} style=${`--metric-columns: ${X[d]}`}>
         <div class="content">
           <div class="temperature-row ${t ? "has-temperature" : ""} ${o ? "has-forecast" : ""}">
-            ${t ? L`
+            ${t ? F`
                   <div class="reading">
                     <div class="label summary-label">
                       <span class="summary-icon current-condition-icon">
-                        <ha-icon icon=${_} role="img" aria-label=${Z(e, g ?? "temperature")}></ha-icon>
+                        <ha-icon icon=${v} role="img" aria-label=${Y(e, _ ?? "temperature")}></ha-icon>
                       </span>
-                      <span>${Z(e, "temperature")}</span>
+                      <span>${Y(e, "temperature")}</span>
                     </div>
                     <div class="value-line">
-                      <div class="temperature" aria-label=${Z(e, "temperature")}>
-                        ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Z(e, "unavailable")}
+                      <div class="temperature" aria-label=${Y(e, "temperature")}>
+                        ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Y(e, "unavailable")}
                       </div>
-                      ${a ? L`<div class="unit">${a}</div>` : ""}
+                      ${a ? F`<div class="unit">${a}</div>` : ""}
                     </div>
                   </div>
-                ` : L`<div class="message">${Z(e, "chooseTemperature")}</div>`}
-            ${o ? L`
+                ` : F`<div class="message">${Y(e, "chooseTemperature")}</div>`}
+            ${o ? F`
                   <div class="reading forecast-summary">
                     <div class="label summary-label">
-                      <span class="summary-icon"><ha-icon icon=${h} aria-hidden="true"></ha-icon></span>
+                      <span class="summary-icon"><ha-icon icon=${g} aria-hidden="true"></ha-icon></span>
                       <span>
-                        ${Z(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
+                        ${Y(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
                       </span>
                     </div>
                     <div class="value-line">
                       <div class="forecast-value">
-                        ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Z(e, "forecastUnavailable")}
+                        ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Y(e, "forecastUnavailable")}
                       </div>
-                      ${u && m ? L`<div class="unit">${m}</div>` : ""}
+                      ${u && h ? F`<div class="unit">${h}</div>` : ""}
                     </div>
                   </div>
                 ` : ""}
           </div>
-          ${Oe(f, e, d)}
-          ${o && this.hourlyEnabled ? L`
-            <section class="hourly" aria-label=${Z(e, "hourlyForecast")}>
-              <div class="label">${Z(e, "hourlyForecast")}</div>
-              ${p.length ? Ne(p, e, c, m) : L`<div class="message" role="status">${Z(e, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
+          ${Ae(f, e, d, p.metrics)}
+          ${We(this.hass, this.config, this.rainfallHistory, p, c)}
+          ${o && this.hourlyEnabled ? F`
+            <section class="hourly" aria-label=${Y(e, "hourlyForecast")}>
+              <div class="label">${Y(e, "hourlyForecast")}</div>
+              ${m.length ? Pe(m, e, c, h) : F`<div class="message" role="status">${Y(e, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
             </section>
           ` : ""}
         </div>
       </ha-card>
     `;
 	}
-}, Ie = class extends J {
+}, qe = class extends W {
 	constructor(...e) {
 		super(...e), this.config = {};
 	}
@@ -1204,39 +1438,60 @@ var $ = "skyscoop-card", Pe = {
 		}));
 	}
 	render() {
-		return L`
+		return F`
       <label class="name-field">
-        ${Z(this.hass?.language, "cardHeader")}
+        ${Y(this.hass?.language, "cardHeader")}
         <input type="text" .value=${this.config.name ?? ""} @input=${this.onNameChanged}>
       </label>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.temperature_entity ?? ""}
-        .label=${Z(this.hass?.language, "temperatureEntity")}
+        .label=${Y(this.hass?.language, "temperatureEntity")}
         .includeDomains=${["sensor"]}
         @value-changed=${this.onTemperatureChanged}
       ></ha-entity-picker>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.weather_entity ?? ""}
-        .label=${Z(this.hass?.language, "weatherEntity")}
+        .label=${Y(this.hass?.language, "weatherEntity")}
         .includeDomains=${["weather"]}
         @value-changed=${this.onWeatherChanged}
       ></ha-entity-picker>
       <details>
-        <summary>${Z(this.hass?.language, "stationMetrics")}</summary>
-        ${_e.map((e) => L`
+        <summary>${Y(this.hass?.language, "stationMetrics")}</summary>
+        ${xe.map((e) => F`
           <ha-entity-picker
             .hass=${this.hass}
             .value=${this.config[e.key] ?? ""}
-            .label=${Z(this.hass?.language, e.label)}
+            .label=${Y(this.hass?.language, e.label)}
+            .includeDomains=${["sensor"]}
+            @value-changed=${(t) => this.updateEntity(e.key, t.detail?.value)}
+          ></ha-entity-picker>
+        `)}
+      </details>
+      <details>
+        <summary>${Y(this.hass?.language, "rainfall")}</summary>
+        <ha-entity-picker
+          data-entity-key="rain_state_entity"
+          .hass=${this.hass}
+          .value=${this.config.rain_state_entity ?? ""}
+          .label=${Y(this.hass?.language, "rainStateEntity")}
+          .includeDomains=${["binary_sensor"]}
+          @value-changed=${(e) => this.updateEntity("rain_state_entity", e.detail?.value)}
+        ></ha-entity-picker>
+        ${Fe.map((e) => F`
+          <ha-entity-picker
+            data-entity-key=${e.key}
+            .hass=${this.hass}
+            .value=${this.config[e.key] ?? ""}
+            .label=${Y(this.hass?.language, e.label)}
             .includeDomains=${["sensor"]}
             @value-changed=${(t) => this.updateEntity(e.key, t.detail?.value)}
           ></ha-entity-picker>
         `)}
       </details>
       <label>
-        ${Z(this.hass?.language, "layout")}
+        ${Y(this.hass?.language, "layout")}
         <select @change=${(e) => {
 			this.config = {
 				...this.config,
@@ -1248,8 +1503,8 @@ var $ = "skyscoop-card", Pe = {
 			"compact",
 			"standard",
 			"wide"
-		].map((e) => L`
-            <option value=${e} ?selected=${(this.config.layout ?? "auto") === e}>${Z(this.hass?.language, e)}</option>
+		].map((e) => F`
+            <option value=${e} ?selected=${(this.config.layout ?? "auto") === e}>${Y(this.hass?.language, e)}</option>
           `)}
         </select>
       </label>
@@ -1261,12 +1516,30 @@ var $ = "skyscoop-card", Pe = {
 				show_hourly_forecast: e.target.checked
 			}, this.emitConfig();
 		}}>
-        ${Z(this.hass?.language, "hourlyForecast")}
+        ${Y(this.hass?.language, "hourlyForecast")}
       </label>
+      ${[{
+			key: "adaptive_metrics",
+			label: "adaptiveMetrics"
+		}, {
+			key: "show_rainfall_history",
+			label: "showRainfallHistory"
+		}].map((e) => F`
+        <label>
+          <input type="checkbox" data-option=${e.key} .checked=${this.config[e.key] !== !1}
+            @change=${(t) => {
+			this.config = {
+				...this.config,
+				[e.key]: t.target.checked
+			}, this.emitConfig();
+		}}>
+          ${Y(this.hass?.language, e.label)}
+        </label>
+      `)}
     `;
 	}
 };
-customElements.get("skyscoop-card") || customElements.define($, Fe), customElements.get("skyscoop-card-editor") || customElements.define("skyscoop-card-editor", Ie), window.customCards ??= [], window.customCards.some((e) => e.type === "skyscoop-card") || window.customCards.push({
+customElements.get("skyscoop-card") || customElements.define($, Ke), customElements.get("skyscoop-card-editor") || customElements.define("skyscoop-card-editor", qe), window.customCards ??= [], window.customCards.some((e) => e.type === "skyscoop-card") || window.customCards.push({
 	type: $,
 	name: "SkyScoop",
 	description: "Weather-station observations and forecast data.",

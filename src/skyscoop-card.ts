@@ -8,6 +8,10 @@ import type { ForecastType, HassLike, SkyScoopConfig } from "./types.js";
 import { ForecastStream } from "./forecast-stream.js";
 import { hourlyCounts, metricColumns, selectLayout, type Layout } from "./responsive.js";
 import { conditionIcons, renderHourlyForecast } from "./hourly-forecast.js";
+import { configuredRainfall } from "./rainfall.js";
+import { RainfallHistory } from "./rainfall-history.js";
+import { metricEmphasis } from "./metric-priority.js";
+import { renderRainfallSection } from "./rainfall-section.js";
 
 export const CARD_TAG = "skyscoop-card";
 
@@ -154,6 +158,25 @@ export class SkyScoopCard extends LitElement {
     .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; line-height: 1.3; }
     .metric-value { margin-top: 6px; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
     .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
+    .metric-reason { min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
+    .metric[data-emphasis="strongWind"] .metric-value, .metric[data-emphasis="highUv"] .metric-value { font-weight: 700; }
+    .metric[data-emphasis="strongWind"] ha-icon, .metric[data-emphasis="highUv"] ha-icon { color: var(--skyscoop-accent); }
+    .rainfall { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
+    .rainfall-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: center; gap: 8px; min-height: 2.5rem; }
+    .rainfall-status { display: flex; justify-content: end; align-items: center; gap: 6px; font-size: 0.8125rem; overflow-wrap: anywhere; }
+    .rainfall ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); flex-shrink: 0; }
+    .rainfall[data-emphasis="wet"] .rainfall-status, .rainfall[data-emphasis="heavy"] .rainfall-status { font-weight: 700; }
+    .rainfall[data-emphasis="wet"] .rainfall-status ha-icon, .rainfall[data-emphasis="heavy"] .rainfall-status ha-icon { color: var(--skyscoop-accent); }
+    .rainfall[data-emphasis="heavy"] .rainfall-status { text-decoration: underline; text-underline-offset: 3px; }
+    .rainfall-metrics { display: grid; grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr)); gap: 12px 16px; margin-top: 8px; }
+    .rainfall-metric { min-width: 0; overflow-wrap: anywhere; }
+    .rainfall-metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; }
+    .rainfall-history { min-width: 0; margin-top: 16px; }
+    .rainfall-plot { display: block; width: 100%; height: 88px; margin-block: 8px; overflow: visible; }
+    .rainfall-plot path { stroke: var(--skyscoop-accent); stroke-width: 2; }
+    .rainfall-placeholder { display: grid; align-items: center; height: 88px; margin-block: 8px; color: var(--skyscoop-muted); font-size: 0.8125rem; }
+    .rainfall-caption { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-height: 2.75rem; font-size: 0.75rem; color: var(--skyscoop-muted); overflow-wrap: anywhere; }
+    .rainfall-history-status { min-height: 1.1rem; font-size: 0.75rem; color: var(--skyscoop-muted); overflow-wrap: anywhere; }
     .hourly { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
     .hourly > .label { font-weight: 500; }
     .hourly-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(56px, 1fr); overflow-x: auto; gap: 0; margin-top: 12px; padding: 8px 0; border-block: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); }
@@ -166,15 +189,16 @@ export class SkyScoopCard extends LitElement {
     .hourly-probability { grid-row: 4; }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
-    @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @container (max-width: 359px) { .station-metrics, .rainfall-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @container (max-width: 359px) { .temperature-row.has-temperature.has-forecast { grid-template-columns: minmax(0, 1fr); } .forecast-summary { border-inline-start: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding: 12px 0 0; } }
-    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
+    @container (max-width: 220px) { .station-metrics, .rainfall-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
   `;
 
   hass?: HassLike;
   config?: SkyScoopConfig;
   private summaryStream = new ForecastStream(() => this.requestUpdate());
   private hourlyStream = new ForecastStream(() => this.requestUpdate());
+  private rainfallHistory = new RainfallHistory(() => this.requestUpdate());
   private widthLayout: Layout = "standard";
   private resizeObserver?: ResizeObserver;
   private summaryTimer?: ReturnType<typeof setInterval>;
@@ -190,6 +214,7 @@ export class SkyScoopCard extends LitElement {
     }
     if (this.hasUpdated) {
       void this.syncForecastSubscription();
+      this.syncRainfallHistory();
       this.syncSummaryTimer();
     }
   }
@@ -199,6 +224,7 @@ export class SkyScoopCard extends LitElement {
     this.clearSummaryTimer();
     this.summaryStream.stop();
     this.hourlyStream.stop();
+    this.rainfallHistory.stop();
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
   }
@@ -207,6 +233,7 @@ export class SkyScoopCard extends LitElement {
     super.updated(changedProperties);
     if (changedProperties.has("hass") || changedProperties.has("config")) {
       void this.syncForecastSubscription();
+      this.syncRainfallHistory();
       this.syncSummaryTimer();
     }
   }
@@ -219,8 +246,10 @@ export class SkyScoopCard extends LitElement {
     if (config.layout !== undefined && !["auto", "compact", "standard", "wide"].includes(config.layout)) {
       throw new Error("SkyScoop layout must be auto, compact, standard, or wide.");
     }
-    if (config.show_hourly_forecast !== undefined && typeof config.show_hourly_forecast !== "boolean") {
-      throw new Error("SkyScoop show_hourly_forecast must be a boolean.");
+    for (const key of ["show_hourly_forecast", "adaptive_metrics", "show_rainfall_history"] as const) {
+      if (config[key] !== undefined && typeof config[key] !== "boolean") {
+        throw new Error(`SkyScoop ${key} must be a boolean.`);
+      }
     }
 
     this.config = { ...config };
@@ -228,8 +257,19 @@ export class SkyScoopCard extends LitElement {
 
   getCardSize(): number {
     const layout = this.activeLayout;
+    const rainfall = configuredRainfall(this.hass, this.config).length;
     return 2 + Math.ceil(configuredMetrics(this.hass, this.config).length / metricColumns[layout])
-      + (this.config?.weather_entity ? 1 : 0) + (this.hourlyEnabled ? 3 : 0);
+      + (this.config?.weather_entity ? 1 : 0) + (this.hourlyEnabled ? 3 : 0)
+      + (rainfall || this.config?.rain_state_entity ? 1 + Math.ceil(rainfall / metricColumns[layout]) : 0)
+      + (this.rainfallHistoryEnabled ? 3 : 0);
+  }
+
+  private get rainfallHistoryEnabled(): boolean {
+    return Boolean(this.config?.rainfall_rate_entity) && this.config?.show_rainfall_history !== false;
+  }
+
+  private syncRainfallHistory(): void {
+    this.rainfallHistory.sync(this.isConnected && this.rainfallHistoryEnabled ? this.hass : undefined, this.config?.rainfall_rate_entity);
   }
 
   private get activeLayout(): Layout {
@@ -271,9 +311,10 @@ export class SkyScoopCard extends LitElement {
   }
 
   private syncSummaryTimer(): void {
-    if (this.isConnected && this.config?.weather_entity && !this.summaryTimer) {
+    const enabled = this.isConnected && (this.config?.weather_entity || this.rainfallHistoryEnabled);
+    if (enabled && !this.summaryTimer) {
       this.summaryTimer = setInterval(() => this.requestUpdate(), 60_000);
-    } else if ((!this.isConnected || !this.config?.weather_entity) && this.summaryTimer) {
+    } else if (!enabled && this.summaryTimer) {
       this.clearSummaryTimer();
     }
   }
@@ -311,6 +352,7 @@ export class SkyScoopCard extends LitElement {
     const forecastSummary = selectForecastSummary(this.summaryStream.forecast, now, timeZone);
     const layout = this.activeLayout;
     const metrics = configuredMetrics(this.hass, this.config);
+    const emphasis = metricEmphasis(this.hass, this.config);
     const hourly = selectHourlyForecast(this.hourlyStream.forecast, now, hourlyCounts[layout]);
     const forecastUnit = typeof weatherEntity?.attributes.temperature_unit === "string"
       ? weatherEntity.attributes.temperature_unit
@@ -373,7 +415,8 @@ export class SkyScoopCard extends LitElement {
                 `
               : ""}
           </div>
-          ${renderStationMetrics(metrics, language, layout)}
+          ${renderStationMetrics(metrics, language, layout, emphasis.metrics)}
+          ${renderRainfallSection(this.hass, this.config, this.rainfallHistory, emphasis, timeZone)}
           ${weatherEntityId && this.hourlyEnabled ? html`
             <section class="hourly" aria-label=${translate(language, "hourlyForecast")}>
               <div class="label">${translate(language, "hourlyForecast")}</div>

@@ -2,6 +2,7 @@ import { LitElement, css, html } from "lit";
 import type { HassLike, SkyScoopConfig } from "./types.js";
 import { translate } from "./localization.js";
 import { stationMetrics, type StationEntityKey } from "./station.js";
+import { rainfallMetrics, type RainfallEntityKey } from "./rainfall.js";
 
 export class SkyScoopCardEditor extends LitElement {
   static styles = css`
@@ -54,7 +55,7 @@ export class SkyScoopCardEditor extends LitElement {
     this.emitConfig();
   }
 
-  private updateEntity(key: "temperature_entity" | "weather_entity" | StationEntityKey, value?: string): void {
+  private updateEntity(key: "temperature_entity" | "weather_entity" | StationEntityKey | RainfallEntityKey, value?: string): void {
     const config = { ...this.config };
 
     if (value) {
@@ -107,6 +108,27 @@ export class SkyScoopCardEditor extends LitElement {
           ></ha-entity-picker>
         `)}
       </details>
+      <details>
+        <summary>${translate(this.hass?.language, "rainfall")}</summary>
+        <ha-entity-picker
+          data-entity-key="rain_state_entity"
+          .hass=${this.hass}
+          .value=${this.config.rain_state_entity ?? ""}
+          .label=${translate(this.hass?.language, "rainStateEntity")}
+          .includeDomains=${["binary_sensor"]}
+          @value-changed=${(event: CustomEvent<{ value?: string }>) => this.updateEntity("rain_state_entity", event.detail?.value)}
+        ></ha-entity-picker>
+        ${rainfallMetrics.map((metric) => html`
+          <ha-entity-picker
+            data-entity-key=${metric.key}
+            .hass=${this.hass}
+            .value=${this.config[metric.key] ?? ""}
+            .label=${translate(this.hass?.language, metric.label)}
+            .includeDomains=${["sensor"]}
+            @value-changed=${(event: CustomEvent<{ value?: string }>) => this.updateEntity(metric.key, event.detail?.value)}
+          ></ha-entity-picker>
+        `)}
+      </details>
       <label>
         ${translate(this.hass?.language, "layout")}
         <select @change=${(event: Event) => {
@@ -126,6 +148,16 @@ export class SkyScoopCardEditor extends LitElement {
           }}>
         ${translate(this.hass?.language, "hourlyForecast")}
       </label>
+      ${([{ key: "adaptive_metrics", label: "adaptiveMetrics" }, { key: "show_rainfall_history", label: "showRainfallHistory" }] as const).map((option) => html`
+        <label>
+          <input type="checkbox" data-option=${option.key} .checked=${this.config[option.key] !== false}
+            @change=${(event: Event) => {
+              this.config = { ...this.config, [option.key]: (event.target as HTMLInputElement).checked };
+              this.emitConfig();
+            }}>
+          ${translate(this.hass?.language, option.label)}
+        </label>
+      `)}
     `;
   }
 }
