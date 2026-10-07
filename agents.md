@@ -4,8 +4,13 @@
 
 - The project is named SkyScoop and registers the Lovelace type `custom:skyscoop-card`.
 - The minimum Home Assistant target is 2026.9.1. Initial distribution is planned through a custom HACS frontend repository.
-- The first implementation slice is the standalone Lit card lifecycle, station-temperature display, starter configuration, basic visual editor, and automated DOM tests. Forecast, rainfall, responsive layout tiers, and broader localization remain future work unless implemented and verified.
-- No live Home Assistant dashboard has been used for validation yet; do not describe the card as integration-tested.
+- Implemented slices include the standalone Lit lifecycle, outdoor station temperature, optional humidity/dew point/wind speed/gust/direction/UV/illuminance, high/low summary, independent hourly forecast, width-aware layouts, visual editor, and automated utility/DOM/browser tests. Rainfall, pressure, adaptive prioritization, comprehensive translations, and unit conversion remain future work.
+- On 2026-10-07 the user reported live HA loading, station temperature, and today's forecast high working. Record this as a limited smoke test, not comprehensive integration testing. The exact HA version and new-feature live behavior remain unverified.
+- Keep `temperature_entity` as the outdoor station sensor mapping. Starter configuration must not guess that an arbitrary temperature sensor is outdoors.
+- Optional station mappings are flat `*_entity` fields. Unconfigured metrics stay hidden; configured unavailable metrics retain an unavailable reading without suppressing other sections.
+- Forecast summary and hourly streams share `weather_entity` but have independent subscriptions and cleanup. Hourly support is feature bit 2, daily bit 1, and twice-daily bit 4. `show_hourly_forecast` defaults to true when supported.
+- `layout` defaults to `auto`, using actual card width: compact below 360px, standard below 600px, and wide at 600px+. Tiers show up to 4/8/12 future hourly entries within 24 hours, respectively, and preserve all configured station readings.
+- Station readings use source sensor units; forecast readings use weather temperature units. Number/time formatting uses HA language and timezone; interface/compass labels currently fall back to English.
 - Prefer actual forecast period timestamps for high/low selection. When unavailable, use 17:00 in Home Assistant local time as the documented first-release fallback; do not add a configuration option for it initially.
 
 ## Project purpose

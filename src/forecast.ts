@@ -1,8 +1,43 @@
+import { finiteValue } from "./station.js";
+
 export interface ForecastPeriod {
   datetime?: unknown;
   temperature?: unknown;
   templow?: unknown;
   is_daytime?: unknown;
+  condition?: unknown;
+  precipitation_probability?: unknown;
+}
+
+export interface HourlyPeriod {
+  timestamp: number;
+  temperature: number;
+  condition?: string;
+  probability?: number;
+}
+
+export function selectHourlyForecast(
+  forecast: readonly ForecastPeriod[] | null | undefined,
+  now: Date,
+  limit: number,
+): HourlyPeriod[] {
+  const start = now.getTime();
+  if (!Number.isFinite(start) || limit <= 0) return [];
+  const periods = new Map<number, HourlyPeriod>();
+  for (const period of forecast ?? []) {
+    if (!period || typeof period.datetime !== "string") continue;
+    const timestamp = Date.parse(period.datetime);
+    const temperature = finiteValue(period.temperature);
+    if (!Number.isFinite(timestamp) || timestamp < start || timestamp >= start + 86_400_000 || temperature === undefined) continue;
+    const probability = finiteValue(period.precipitation_probability);
+    if (!periods.has(timestamp)) periods.set(timestamp, {
+      timestamp,
+      temperature,
+      condition: typeof period.condition === "string" ? period.condition : undefined,
+      probability: probability !== undefined && probability >= 0 && probability <= 100 ? probability : undefined,
+    });
+  }
+  return [...periods.values()].sort((first, second) => first.timestamp - second.timestamp).slice(0, limit);
 }
 
 export interface ForecastSummary {
