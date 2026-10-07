@@ -665,6 +665,7 @@ function Se(e, t, n = "UTC") {
 //#region src/localization.ts
 var Ce = { en: {
 	temperature: "Outdoor temperature",
+	cardHeader: "Card header (optional)",
 	unavailable: "Unavailable",
 	chooseTemperature: "Choose an outdoor weather-station temperature sensor in the card configuration.",
 	temperatureEntity: "Outdoor / weather-station temperature sensor",
@@ -906,13 +907,59 @@ var $ = "skyscoop-card", Pe = class extends J {
       padding: 16px;
     }
 
+    .temperature-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .temperature-row.has-temperature.has-forecast {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reading { min-width: 0; }
+
+    .summary-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+    }
+
+    .summary-icon {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      border-radius: 50%;
+      color: var(--skyscoop-accent);
+      background: var(--secondary-background-color, rgba(127, 127, 127, 0.12));
+    }
+
+    .summary-icon ha-icon { --mdc-icon-size: 18px; }
+
+    .forecast-summary {
+      min-width: 0;
+      border-inline-start: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+      padding-inline-start: 16px;
+    }
+
+    .value-line {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      column-gap: 8px;
+    }
+
     .label {
       color: var(--skyscoop-muted);
       font-size: 0.875rem;
     }
 
     .temperature {
-      margin-top: 4px;
       color: var(--skyscoop-accent);
       font-size: 2rem;
       font-weight: 600;
@@ -928,25 +975,15 @@ var $ = "skyscoop-card", Pe = class extends J {
     }
 
     .unit {
-      align-self: center;
       color: var(--skyscoop-muted);
-      font-size: 1rem;
-    }
-
-    .forecast-summary {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding-top: 4px;
-      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+      font-size: 0.9375rem;
     }
 
     .forecast-value {
-      margin-top: 4px;
-      font-size: 1.125rem;
+      color: var(--primary-text-color, #202927);
+      font-size: 1.75rem;
       font-weight: 500;
+      line-height: 1.2;
       font-variant-numeric: tabular-nums;
     }
 
@@ -971,9 +1008,9 @@ var $ = "skyscoop-card", Pe = class extends J {
     .hourly-probability { grid-row: 4; color: var(--skyscoop-muted); }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
-    .forecast-summary > div:first-child { min-width: 0; }
     @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } }
+    @container (max-width: 359px) { .temperature-row.has-temperature.has-forecast { grid-template-columns: minmax(0, 1fr); } .forecast-summary { border-inline-start: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding: 12px 0 0; } }
+    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
   `;
 	}
 	connectedCallback() {
@@ -1034,33 +1071,43 @@ var $ = "skyscoop-card", Pe = class extends J {
 		return document.createElement("skyscoop-card-editor");
 	}
 	render() {
-		let e = this.hass?.language, t = this.config?.temperature_entity, n = _e(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Se(this.summaryStream.forecast, l, c), d = this.activeLayout, f = ve(this.hass, this.config), p = ye(this.hourlyStream.forecast, l, ke[d]), m = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "";
+		let e = this.hass?.language, t = this.config?.temperature_entity, n = _e(this.hass, t), r = n.value, i = r !== void 0, a = n.unit, o = this.config?.weather_entity, s = o ? this.hass?.states[o] : void 0, c = this.hass?.config?.time_zone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC", l = /* @__PURE__ */ new Date(), u = Se(this.summaryStream.forecast, l, c), d = this.activeLayout, f = ve(this.hass, this.config), p = ye(this.hourlyStream.forecast, l, ke[d]), m = typeof s?.attributes.temperature_unit == "string" ? s.attributes.temperature_unit : "", h = u?.kind === "low" ? "mdi:thermometer-chevron-down" : u ? "mdi:thermometer-chevron-up" : "mdi:thermometer";
 		return L`
-      <ha-card .header=${this.config?.name || "SkyScoop"} data-layout=${d} style=${`--metric-columns: ${Ae[d]}`}>
+      <ha-card .header=${this.config?.name?.trim() || void 0} data-layout=${d} style=${`--metric-columns: ${Ae[d]}`}>
         <div class="content">
-          ${t ? L`
-                <div>
-                  <div class="label">${Q(e, "temperature")}</div>
-                  <div class="temperature" aria-label=${Q(e, "temperature")}>
-                    ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Q(e, "unavailable")}
+          <div class="temperature-row ${t ? "has-temperature" : ""} ${o ? "has-forecast" : ""}">
+            ${t ? L`
+                  <div class="reading">
+                    <div class="label summary-label">
+                      <span class="summary-icon"><ha-icon icon="mdi:thermometer" aria-hidden="true"></ha-icon></span>
+                      <span>${Q(e, "temperature")}</span>
+                    </div>
+                    <div class="value-line">
+                      <div class="temperature" aria-label=${Q(e, "temperature")}>
+                        ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Q(e, "unavailable")}
+                      </div>
+                      ${a ? L`<div class="unit">${a}</div>` : ""}
+                    </div>
                   </div>
-                </div>
-                ${a ? L`<div class="unit">${a}</div>` : ""}
-              ` : L`<div class="message">${Q(e, "chooseTemperature")}</div>`}
+                ` : L`<div class="message">${Q(e, "chooseTemperature")}</div>`}
+            ${o ? L`
+                  <div class="reading forecast-summary">
+                    <div class="label summary-label">
+                      <span class="summary-icon"><ha-icon icon=${h} aria-hidden="true"></ha-icon></span>
+                      <span>
+                        ${Q(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
+                      </span>
+                    </div>
+                    <div class="value-line">
+                      <div class="forecast-value">
+                        ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Q(e, "forecastUnavailable")}
+                      </div>
+                      ${u && m ? L`<div class="unit">${m}</div>` : ""}
+                    </div>
+                  </div>
+                ` : ""}
+          </div>
           ${De(f, e, d)}
-          ${o ? L`
-                <div class="forecast-summary">
-                  <div>
-                    <div class="label">
-                      ${Q(e, u ? u.kind === "low" ? "forecastLow" : "forecastHigh" : "forecastSummary")}
-                    </div>
-                    <div class="forecast-value">
-                      ${u ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(u.temperature) : Q(e, "forecastUnavailable")}
-                    </div>
-                  </div>
-                  ${u && m ? L`<div class="unit">${m}</div>` : ""}
-                </div>
-              ` : ""}
           ${o && this.hourlyEnabled ? L`
             <section class="hourly" aria-label=${Q(e, "hourlyForecast")}>
               <div class="label">${Q(e, "hourlyForecast")}</div>
@@ -1082,6 +1129,8 @@ var $ = "skyscoop-card", Pe = class extends J {
     summary { cursor: pointer; padding: 8px 0; }
     ha-entity-picker { display: block; margin-bottom: 8px; }
     label { display: flex; align-items: center; gap: 12px; color: var(--primary-text-color); }
+    .name-field { display: grid; align-items: start; gap: 4px; }
+    .name-field input { box-sizing: border-box; width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--divider-color, #888); border-radius: 4px; color: var(--primary-text-color); background: var(--card-background-color); font: inherit; }
     select { font: inherit; color: var(--primary-text-color); background: var(--card-background-color); padding: 8px; min-width: 0; }
   `;
 	}
@@ -1104,6 +1153,10 @@ var $ = "skyscoop-card", Pe = class extends J {
 	onWeatherChanged(e) {
 		this.updateEntity("weather_entity", e.detail?.value);
 	}
+	onNameChanged(e) {
+		let t = e.currentTarget.value, n = { ...this.config };
+		t ? n.name = t : delete n.name, this.config = n, this.emitConfig();
+	}
 	updateEntity(e, t) {
 		let n = { ...this.config };
 		t ? n[e] = t : delete n[e], this.config = n, this.emitConfig();
@@ -1117,6 +1170,10 @@ var $ = "skyscoop-card", Pe = class extends J {
 	}
 	render() {
 		return L`
+      <label class="name-field">
+        ${Q(this.hass?.language, "cardHeader")}
+        <input type="text" .value=${this.config.name ?? ""} @input=${this.onNameChanged}>
+      </label>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.temperature_entity ?? ""}

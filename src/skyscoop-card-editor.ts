@@ -10,6 +10,8 @@ export class SkyScoopCardEditor extends LitElement {
     summary { cursor: pointer; padding: 8px 0; }
     ha-entity-picker { display: block; margin-bottom: 8px; }
     label { display: flex; align-items: center; gap: 12px; color: var(--primary-text-color); }
+    .name-field { display: grid; align-items: start; gap: 4px; }
+    .name-field input { box-sizing: border-box; width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--divider-color, #888); border-radius: 4px; color: var(--primary-text-color); background: var(--card-background-color); font: inherit; }
     select { font: inherit; color: var(--primary-text-color); background: var(--card-background-color); padding: 8px; min-width: 0; }
   `;
 
@@ -38,6 +40,20 @@ export class SkyScoopCardEditor extends LitElement {
     this.updateEntity("weather_entity", (event as CustomEvent<{ value?: string }>).detail?.value);
   }
 
+  private onNameChanged(event: Event): void {
+    const name = (event.currentTarget as HTMLInputElement).value;
+    const config = { ...this.config };
+
+    if (name) {
+      config.name = name;
+    } else {
+      delete config.name;
+    }
+
+    this.config = config;
+    this.emitConfig();
+  }
+
   private updateEntity(key: "temperature_entity" | "weather_entity" | StationEntityKey, value?: string): void {
     const config = { ...this.config };
 
@@ -61,6 +77,10 @@ export class SkyScoopCardEditor extends LitElement {
 
   render() {
     return html`
+      <label class="name-field">
+        ${translate(this.hass?.language, "cardHeader")}
+        <input type="text" .value=${this.config.name ?? ""} @input=${this.onNameChanged}>
+      </label>
       <ha-entity-picker
         .hass=${this.hass}
         .value=${this.config.temperature_entity ?? ""}

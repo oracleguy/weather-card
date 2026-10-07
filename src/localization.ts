@@ -1,6 +1,7 @@
 const messages = {
   en: {
     temperature: "Outdoor temperature",
+    cardHeader: "Card header (optional)",
     unavailable: "Unavailable",
     chooseTemperature: "Choose an outdoor weather-station temperature sensor in the card configuration.",
     temperatureEntity: "Outdoor / weather-station temperature sensor",

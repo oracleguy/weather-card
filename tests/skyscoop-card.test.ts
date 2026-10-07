@@ -32,8 +32,22 @@ describe("SkyScoop card", () => {
     document.body.append(card);
     await card.updateComplete;
 
+    expect((card.shadowRoot?.querySelector("ha-card") as (HTMLElement & { header?: string }) | null)?.header).toBeUndefined();
     expect(card.shadowRoot?.querySelector(".temperature")?.textContent).toContain("18.5");
     expect(card.shadowRoot?.querySelector(".unit")?.textContent).toBe("°C");
+  });
+
+  it("uses a trimmed configured name as the card header", async () => {
+    const card = document.createElement(CARD_TAG) as SkyScoopCard;
+    card.setConfig({ name: " \t " });
+    card.hass = { states: {} };
+    document.body.append(card);
+    await card.updateComplete;
+
+    expect((card.shadowRoot?.querySelector("ha-card") as (HTMLElement & { header?: string }) | null)?.header).toBeUndefined();
+    card.setConfig({ name: "  Backyard  " });
+    await card.updateComplete;
+    expect((card.shadowRoot?.querySelector("ha-card") as (HTMLElement & { header?: string }) | null)?.header).toBe("Backyard");
   });
 
   it("subscribes to forecast data and keeps it separate from station temperature", async () => {
@@ -84,6 +98,7 @@ describe("SkyScoop card", () => {
 
     expect(card.shadowRoot?.querySelector(".temperature")?.textContent).toContain("18.5");
     expect(card.shadowRoot?.querySelector(".forecast-value")?.textContent).toMatch(/27|13/);
+    expect(card.shadowRoot?.querySelector(".temperature-row")?.classList.contains("has-forecast")).toBe(true);
     expect(card.shadowRoot?.querySelector(".forecast-summary .unit")?.textContent).toBe("°F");
   });
 
@@ -146,6 +161,26 @@ describe("SkyScoop card", () => {
       type: "custom:skyscoop-card",
       temperature_entity: "sensor.outdoor_temperature",
     });
+  });
+
+  it("edits and clears the optional card header", async () => {
+    const editor = document.createElement("skyscoop-card-editor") as SkyScoopCardEditor;
+    editor.setConfig({ type: "custom:skyscoop-card" });
+    document.body.append(editor);
+    await editor.updateComplete;
+    const input = editor.shadowRoot?.querySelector<HTMLInputElement>(".name-field input");
+    let changedConfig: unknown;
+    editor.addEventListener("config-changed", (event) => {
+      changedConfig = (event as CustomEvent).detail.config;
+    });
+
+    input!.value = "Backyard";
+    input!.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(changedConfig).toEqual({ type: "custom:skyscoop-card", name: "Backyard" });
+
+    input!.value = "";
+    input!.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(changedConfig).toEqual({ type: "custom:skyscoop-card" });
   });
 
   it("edits the weather entity without dropping the temperature entity", async () => {
@@ -324,7 +359,7 @@ describe("station metrics, hourly forecasts and layouts", () => {
     expect(select.value).toBe("wide");
     select.value = "compact";
     select.dispatchEvent(new Event("change"));
-    const checkbox = editor.shadowRoot?.querySelector("input") as HTMLInputElement;
+    const checkbox = editor.shadowRoot?.querySelector('input[type="checkbox"]') as HTMLInputElement;
     checkbox.checked = false;
     checkbox.dispatchEvent(new Event("change"));
     expect(editor.config).toEqual({ ...original, layout: "compact", show_hourly_forecast: false });

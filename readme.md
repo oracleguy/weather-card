@@ -39,6 +39,8 @@ The default `layout: auto` observes the card's allocated width, not the browser 
 
 The measured temperature, high/low summary, and all configured station metrics remain available in every tier. The hourly strip scrolls horizontally when needed and is keyboard-focusable. Manual `compact`, `standard`, and `wide` overrides are available; metric columns still reduce at narrow widths to avoid overflow. Rainfall is not implemented yet.
 
+The measured outdoor temperature and the forecast high/low share a two-column summary when the card is at least 360px wide. They stack below that width to keep their labels and values readable. The header is hidden unless a non-empty `name` is configured.
+
 ## Installation
 
 The initial distribution target is a custom HACS frontend repository. Install SkyScoop through HACS, then add its JavaScript resource if HACS does not add it automatically. For the `weather-card` repository, the resource URL is `/hacsfiles/weather-card/skyscoop-card.js` and its type must be **JavaScript Module**.
@@ -106,6 +108,7 @@ Replace these example entity IDs with your own. All optional mappings can be con
 
 | Option | Meaning / default |
 | --- | --- |
+| `name` | Optional card header; omitted or blank hides the header. |
 | `temperature_entity` | Measured outdoor station temperature; no guessed default. |
 | `weather_entity` | Forecast provider; never replaces measured temperature. |
 | `humidity_entity` | Numeric relative humidity from 0 to 100. |

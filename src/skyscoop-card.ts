@@ -41,13 +41,59 @@ export class SkyScoopCard extends LitElement {
       padding: 16px;
     }
 
+    .temperature-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .temperature-row.has-temperature.has-forecast {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reading { min-width: 0; }
+
+    .summary-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+    }
+
+    .summary-icon {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      border-radius: 50%;
+      color: var(--skyscoop-accent);
+      background: var(--secondary-background-color, rgba(127, 127, 127, 0.12));
+    }
+
+    .summary-icon ha-icon { --mdc-icon-size: 18px; }
+
+    .forecast-summary {
+      min-width: 0;
+      border-inline-start: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+      padding-inline-start: 16px;
+    }
+
+    .value-line {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      column-gap: 8px;
+    }
+
     .label {
       color: var(--skyscoop-muted);
       font-size: 0.875rem;
     }
 
     .temperature {
-      margin-top: 4px;
       color: var(--skyscoop-accent);
       font-size: 2rem;
       font-weight: 600;
@@ -63,25 +109,15 @@ export class SkyScoopCard extends LitElement {
     }
 
     .unit {
-      align-self: center;
       color: var(--skyscoop-muted);
-      font-size: 1rem;
-    }
-
-    .forecast-summary {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding-top: 4px;
-      border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+      font-size: 0.9375rem;
     }
 
     .forecast-value {
-      margin-top: 4px;
-      font-size: 1.125rem;
+      color: var(--primary-text-color, #202927);
+      font-size: 1.75rem;
       font-weight: 500;
+      line-height: 1.2;
       font-variant-numeric: tabular-nums;
     }
 
@@ -106,9 +142,9 @@ export class SkyScoopCard extends LitElement {
     .hourly-probability { grid-row: 4; color: var(--skyscoop-muted); }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
-    .forecast-summary > div:first-child { min-width: 0; }
     @container (max-width: 359px) { .station-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } }
+    @container (max-width: 359px) { .temperature-row.has-temperature.has-forecast { grid-template-columns: minmax(0, 1fr); } .forecast-summary { border-inline-start: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding: 12px 0 0; } }
+    @container (max-width: 220px) { .station-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
   `;
 
   hass?: HassLike;
@@ -255,45 +291,58 @@ export class SkyScoopCard extends LitElement {
     const forecastUnit = typeof weatherEntity?.attributes.temperature_unit === "string"
       ? weatherEntity.attributes.temperature_unit
       : "";
-    const header = this.config?.name || "SkyScoop";
+    const forecastIcon = forecastSummary?.kind === "low"
+      ? "mdi:thermometer-chevron-down"
+      : forecastSummary ? "mdi:thermometer-chevron-up" : "mdi:thermometer";
+    const header = this.config?.name?.trim() || undefined;
 
     return html`
       <ha-card .header=${header} data-layout=${layout} style=${`--metric-columns: ${metricColumns[layout]}`}>
         <div class="content">
-          ${entityId
-            ? html`
-                <div>
-                  <div class="label">${translate(language, "temperature")}</div>
-                  <div class="temperature" aria-label=${translate(language, "temperature")}>
-                    ${available
-                      ? new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 }).format(numericValue!)
-                      : translate(language, "unavailable")}
+          <div class="temperature-row ${entityId ? "has-temperature" : ""} ${weatherEntityId ? "has-forecast" : ""}">
+            ${entityId
+              ? html`
+                  <div class="reading">
+                    <div class="label summary-label">
+                      <span class="summary-icon"><ha-icon icon="mdi:thermometer" aria-hidden="true"></ha-icon></span>
+                      <span>${translate(language, "temperature")}</span>
+                    </div>
+                    <div class="value-line">
+                      <div class="temperature" aria-label=${translate(language, "temperature")}>
+                        ${available
+                          ? new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 }).format(numericValue!)
+                          : translate(language, "unavailable")}
+                      </div>
+                      ${unit ? html`<div class="unit">${unit}</div>` : ""}
+                    </div>
                   </div>
-                </div>
-                ${unit ? html`<div class="unit">${unit}</div>` : ""}
-              `
-            : html`<div class="message">${translate(language, "chooseTemperature")}</div>`}
+                `
+              : html`<div class="message">${translate(language, "chooseTemperature")}</div>`}
+            ${weatherEntityId
+              ? html`
+                  <div class="reading forecast-summary">
+                    <div class="label summary-label">
+                      <span class="summary-icon"><ha-icon icon=${forecastIcon} aria-hidden="true"></ha-icon></span>
+                      <span>
+                        ${translate(language, forecastSummary
+                          ? forecastSummary.kind === "low" ? "forecastLow" : "forecastHigh"
+                          : "forecastSummary")}
+                      </span>
+                    </div>
+                    <div class="value-line">
+                      <div class="forecast-value">
+                        ${forecastSummary
+                          ? new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 })
+                            .format(forecastSummary.temperature)
+                          : translate(language, "forecastUnavailable")}
+                      </div>
+                      ${forecastSummary && forecastUnit ? html`<div class="unit">${forecastUnit}</div>` : ""}
+                    </div>
+                  </div>
+                `
+              : ""}
+          </div>
           ${renderStationMetrics(metrics, language, layout)}
-          ${weatherEntityId
-            ? html`
-                <div class="forecast-summary">
-                  <div>
-                    <div class="label">
-                      ${translate(language, forecastSummary
-                        ? forecastSummary.kind === "low" ? "forecastLow" : "forecastHigh"
-                        : "forecastSummary")}
-                    </div>
-                    <div class="forecast-value">
-                      ${forecastSummary
-                        ? new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 })
-                          .format(forecastSummary.temperature)
-                        : translate(language, "forecastUnavailable")}
-                    </div>
-                  </div>
-                  ${forecastSummary && forecastUnit ? html`<div class="unit">${forecastUnit}</div>` : ""}
-                </div>
-              `
-            : ""}
           ${weatherEntityId && this.hourlyEnabled ? html`
             <section class="hourly" aria-label=${translate(language, "hourlyForecast")}>
               <div class="label">${translate(language, "hourlyForecast")}</div>

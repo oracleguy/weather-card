@@ -1,9 +1,12 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { mdiWaterPercent, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWater } from "@mdi/js";
+import { mdiWaterPercent, mdiThermometer, mdiThermometerChevronUp, mdiThermometerChevronDown, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWater } from "@mdi/js";
 
 const fixtureIcons = {
-  "mdi:water-percent": mdiWaterPercent, "mdi:thermometer-water": mdiThermometerWater,
+  "mdi:water-percent": mdiWaterPercent, "mdi:thermometer": mdiThermometer,
+  "mdi:thermometer-chevron-up": mdiThermometerChevronUp,
+  "mdi:thermometer-chevron-down": mdiThermometerChevronDown,
+  "mdi:thermometer-water": mdiThermometerWater,
   "mdi:weather-windy": mdiWeatherWindy, "mdi:compass-outline": mdiCompassOutline,
   "mdi:weather-sunny-alert": mdiWeatherSunnyAlert, "mdi:brightness-6": mdiBrightness6,
   "mdi:weather-cloudy": mdiWeatherCloudy, "mdi:weather-rainy": mdiWeatherRainy, "mdi:water": mdiWater,
@@ -76,12 +79,14 @@ test("loads the built bundle and renders a station temperature", async ({ page }
     return {
       temperature: card.shadowRoot.querySelector(".temperature")?.textContent.trim(),
       unit: card.shadowRoot.querySelector(".unit")?.textContent.trim(),
+      header: card.shadowRoot.querySelector("ha-card")?.shadowRoot.querySelector("h2")?.textContent.trim(),
       registered: window.customCards?.some((item) => item.type === "skyscoop-card"),
     };
   });
 
   expect(result.temperature).toBe("18.5");
   expect(result.unit).toBe("°C");
+  expect(result.header).toBe("");
   expect(result.registered).toBe(true);
 });
 
@@ -93,6 +98,7 @@ test("the built bundle subscribes to and renders a separate forecast summary", a
     let subscription: any;
     const card = document.createElement("skyscoop-card") as any;
     card.setConfig({
+      name: "Backyard",
       temperature_entity: "sensor.outdoor_temperature",
       weather_entity: "weather.home",
     });
@@ -128,12 +134,14 @@ test("the built bundle subscribes to and renders a separate forecast summary", a
     return {
       temperature: card.shadowRoot.querySelector(".temperature")?.textContent.trim(),
       forecast: card.shadowRoot.querySelector(".forecast-value")?.textContent.trim(),
+      header: card.shadowRoot.querySelector("ha-card")?.shadowRoot.querySelector("h2")?.textContent.trim(),
       subscription,
     };
   });
 
   expect(result.temperature).toBe("18.5");
   expect(result.forecast).toMatch(/27|13/);
+  expect(result.header).toBe("Backyard");
   expect(result.subscription).toEqual({
     type: "weather/subscribe_forecast",
     forecast_type: "daily",
@@ -192,6 +200,9 @@ test("responds to allocated width with full station metrics and independent fore
         .every((item) => item.scrollWidth <= item.clientWidth + 1);
     });
     expect(fits).toBe(true);
+    const summaryColumns = await card.locator(".temperature-row").evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.split(" ").length);
+    expect(summaryColumns).toBe(width < 360 ? 1 : 2);
     const iconsRender = await card.evaluate((element) => [...element.shadowRoot!.querySelectorAll("ha-icon")]
       .every((icon) => Boolean(icon.shadowRoot?.querySelector("path")?.getAttribute("d"))));
     expect(iconsRender).toBe(true);
@@ -234,11 +245,14 @@ test("built editor keeps configured layout and exposes optional controls", async
     await editor.updateComplete;
   });
   const editor = page.locator("skyscoop-card-editor");
+  const nameInput = editor.locator(".name-field input");
+  await expect(nameInput).toHaveValue("");
   await expect(editor.locator("select")).toHaveValue("wide");
   await expect(editor.locator("input[type=checkbox]")).not.toBeChecked();
   await expect(editor.locator("ha-entity-picker")).toHaveCount(9);
+  await nameInput.fill("Backyard");
   await editor.locator("select").selectOption("compact");
   await editor.locator("input[type=checkbox]").check();
   const config = await editor.evaluate((element: any) => element.config);
-  expect(config).toEqual({ temperature_entity: "sensor.outdoor", layout: "compact", show_hourly_forecast: true });
+  expect(config).toEqual({ temperature_entity: "sensor.outdoor", layout: "compact", show_hourly_forecast: true, name: "Backyard" });
 });
