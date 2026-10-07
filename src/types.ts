@@ -3,7 +3,7 @@ export interface HassEntity {
   attributes: Record<string, unknown>;
 }
 
-export type ForecastType = "daily" | "twice_daily";
+export type ForecastType = "daily" | "twice_daily" | "hourly";
 
 export interface ForecastSubscriptionEvent {
   type: ForecastType;
@@ -12,6 +12,8 @@ export interface ForecastSubscriptionEvent {
     temperature?: unknown;
     templow?: unknown;
     is_daytime?: unknown;
+    condition?: unknown;
+    precipitation_probability?: unknown;
   }> | null;
 }
 
@@ -38,6 +40,15 @@ export interface SkyScoopConfig {
   name?: string;
   temperature_entity?: string;
   weather_entity?: string;
+  humidity_entity?: string;
+  dew_point_entity?: string;
+  wind_speed_entity?: string;
+  wind_gust_entity?: string;
+  wind_direction_entity?: string;
+  uv_index_entity?: string;
+  illuminance_entity?: string;
+  layout?: "auto" | "compact" | "standard" | "wide";
+  show_hourly_forecast?: boolean;
 }
 
 export interface CustomCardDescriptor {

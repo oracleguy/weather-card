@@ -1,6 +1,58 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { mdiWaterPercent, mdiThermometerWater, mdiWeatherWindy, mdiCompassOutline, mdiWeatherSunnyAlert, mdiBrightness6, mdiWeatherCloudy, mdiWeatherRainy, mdiWater } from "@mdi/js";
+
+const fixtureIcons = {
+  "mdi:water-percent": mdiWaterPercent, "mdi:thermometer-water": mdiThermometerWater,
+  "mdi:weather-windy": mdiWeatherWindy, "mdi:compass-outline": mdiCompassOutline,
+  "mdi:weather-sunny-alert": mdiWeatherSunnyAlert, "mdi:brightness-6": mdiBrightness6,
+  "mdi:weather-cloudy": mdiWeatherCloudy, "mdi:weather-rainy": mdiWeatherRainy, "mdi:water": mdiWater,
+};
+
+async function mountCompleteCard(page: Page, width: number, language = "en-US") {
+  await page.clock.install({ time: new Date("2026-10-07T12:00:00Z") });
+  await page.evaluate(async ({ width, language }) => {
+    const card = document.createElement("skyscoop-card") as any;
+    card.style.width = `${width}px`;
+    card.setConfig({
+      temperature_entity: "sensor.outdoor", weather_entity: "weather.home",
+      humidity_entity: "sensor.humidity", dew_point_entity: "sensor.dew",
+      wind_speed_entity: "sensor.wind", wind_gust_entity: "sensor.gust",
+      wind_direction_entity: "sensor.direction", uv_index_entity: "sensor.uv", illuminance_entity: "sensor.lux",
+    });
+    card.hass = {
+      language, config: { time_zone: "America/Los_Angeles" },
+      states: {
+        "sensor.outdoor": { state: "18.5", attributes: { unit_of_measurement: "°C" } },
+        "sensor.humidity": { state: "76", attributes: { unit_of_measurement: "%" } },
+        "sensor.dew": { state: "12.5", attributes: { unit_of_measurement: "°C" } },
+        "sensor.wind": { state: "3.5", attributes: { unit_of_measurement: "m/s" } },
+        "sensor.gust": { state: "7", attributes: { unit_of_measurement: "m/s" } },
+        "sensor.direction": { state: "360", attributes: { unit_of_measurement: "°" } },
+        "sensor.uv": { state: "0", attributes: {} },
+        "sensor.lux": { state: "12400", attributes: { unit_of_measurement: "lx" } },
+        "weather.home": { state: "cloudy", attributes: { supported_features: 3, temperature_unit: "°F" } },
+      },
+      connection: {
+        subscribeMessage: async (callback: (event: any) => void, message: any) => {
+          callback({ type: message.forecast_type, forecast: message.forecast_type === "daily"
+            ? [{ datetime: "2026-10-07T12:00:00Z", temperature: 66, templow: 48 }]
+            : Array.from({ length: 12 }, (_, index) => ({
+                datetime: new Date(Date.parse("2026-10-07T13:00:00Z") + index * 3_600_000).toISOString(),
+                temperature: 55 + index, condition: index % 2 ? "rainy" : "cloudy", precipitation_probability: index * 5,
+              })) });
+          return () => undefined;
+        },
+      },
+    };
+    document.body.append(card);
+    await card.updateComplete;
+    await card.updateComplete;
+  }, { width, language });
+}
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript((icons) => { (window as any).skyscoopTestIcons = icons; }, fixtureIcons);
   await page.goto("/browser-test.html");
   await page.waitForFunction(() => Boolean(customElements.get("skyscoop-card")));
 });
@@ -118,4 +170,75 @@ test("the built editor dispatches updated configuration", async ({ page }) => {
     type: "custom:skyscoop-card",
     temperature_entity: "sensor.backyard_temperature",
   });
+});
+
+test("responds to allocated width with full station metrics and independent forecasts", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await mountCompleteCard(page, 280);
+  const card = page.locator("skyscoop-card");
+  for (const [width, layout, count] of [
+    [280, "compact", 4], [359, "compact", 4], [360, "standard", 8],
+    [599, "standard", 8], [600, "wide", 12], [900, "wide", 12],
+  ] as const) {
+    await card.evaluate((element, width) => { element.style.width = `${width}px`; }, width);
+    await expect(card.locator("ha-card")).toHaveAttribute("data-layout", layout);
+    await expect(card.locator(".hourly-period")).toHaveCount(count);
+    await expect(card.locator(".metric")).toHaveCount(7);
+    await expect(card.locator(".temperature")).toHaveText("18.5");
+    await expect(card.locator(".forecast-value")).toHaveText("66");
+    const fits = await card.evaluate((element) => {
+      const root = element.shadowRoot!;
+      return [...root.querySelectorAll<HTMLElement>(".content, .metric, .temperature, .label, .hourly-period")]
+        .every((item) => item.scrollWidth <= item.clientWidth + 1);
+    });
+    expect(fits).toBe(true);
+    const iconsRender = await card.evaluate((element) => [...element.shadowRoot!.querySelectorAll("ha-icon")]
+      .every((icon) => Boolean(icon.shadowRoot?.querySelector("path")?.getAttribute("d"))));
+    expect(iconsRender).toBe(true);
+    if (width === 280 || width === 900) {
+      expect(await card.locator(".hourly-strip").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+    }
+    await card.screenshot({ path: testInfo.outputPath(`card-${width}.png`) });
+  }
+});
+
+test("fits mobile, formats locale values, and preserves partial unavailable configuration", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  await mountCompleteCard(page, 280, "de-DE");
+  const card = page.locator("skyscoop-card");
+  await expect(card.locator(".temperature")).toHaveText("18,5");
+  await expect(card.locator("ha-card")).toHaveAttribute("data-layout", "compact");
+  await expect(card.locator(".hourly-period time").first()).toHaveText("6:00");
+  await expect(card.locator("[data-metric=wind_direction_entity] .metric-value")).toHaveText("N (0°)");
+  await expect(card.locator(".hourly-period > ha-icon").first()).toHaveAttribute("aria-label", "Cloudy");
+  await card.screenshot({ path: testInfo.outputPath("card-mobile-de.png") });
+  await card.evaluate(async (element: any) => {
+    element.setConfig({ temperature_entity: "sensor.outdoor", wind_gust_entity: "sensor.missing", layout: "wide" });
+    element.hass = { ...element.hass, states: { "sensor.outdoor": { state: "unavailable", attributes: {} } } };
+    await element.updateComplete;
+  });
+  await expect(card.locator(".metric")).toHaveCount(1);
+  await expect(card.locator(".temperature")).toHaveText("Unavailable");
+  await expect(card.locator(".metric-value")).toHaveText("Unavailable");
+  await expect(card.locator(".hourly")).toHaveCount(0);
+  expect(await card.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await card.screenshot({ path: testInfo.outputPath("card-partial-mobile.png") });
+});
+
+test("built editor keeps configured layout and exposes optional controls", async ({ page }) => {
+  await page.evaluate(async () => {
+    const editor = document.createElement("skyscoop-card-editor") as any;
+    editor.style.width = "280px";
+    editor.setConfig({ temperature_entity: "sensor.outdoor", layout: "wide", show_hourly_forecast: false });
+    document.body.append(editor);
+    await editor.updateComplete;
+  });
+  const editor = page.locator("skyscoop-card-editor");
+  await expect(editor.locator("select")).toHaveValue("wide");
+  await expect(editor.locator("input[type=checkbox]")).not.toBeChecked();
+  await expect(editor.locator("ha-entity-picker")).toHaveCount(9);
+  await editor.locator("select").selectOption("compact");
+  await editor.locator("input[type=checkbox]").check();
+  const config = await editor.evaluate((element: any) => element.config);
+  expect(config).toEqual({ temperature_entity: "sensor.outdoor", layout: "compact", show_hourly_forecast: true });
 });

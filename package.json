@@ -18,6 +18,7 @@
     "lit": "^3.3.1"
   },
   "devDependencies": {
+    "@mdi/js": "^7.4.47",
     "@playwright/test": "^1.63.0",
     "happy-dom": "^20.14.5",
     "typescript": "^5.9.3",
