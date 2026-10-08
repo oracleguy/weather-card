@@ -5,7 +5,7 @@ import type { Layout } from "./responsive.js";
 import type { configuredMetrics } from "./station.js";
 import type { MetricEmphasis } from "./metric-priority.js";
 
-export function renderStationMetrics(metrics: ReturnType<typeof configuredMetrics>, language: string | undefined, layout: Layout, emphasis: MetricEmphasis = {}) {
+export function renderStationMetrics(metrics: ReturnType<typeof configuredMetrics>, language: string | undefined, layout: Layout, showMoreInfo: (entityId: string) => void, emphasis: MetricEmphasis = {}) {
   if (!metrics.length) return "";
   const number = new Intl.NumberFormat(language || "en", { maximumFractionDigits: 1 });
   return html`
@@ -19,11 +19,12 @@ export function renderStationMetrics(metrics: ReturnType<typeof configuredMetric
         const reason = emphasis[metric.key];
         const adaptive = metric.key.startsWith("wind_") || metric.key === "uv_index_entity";
         return html`
-          <div class="metric" data-metric=${metric.key} data-emphasis=${reason ?? "none"}>
-            <div class="label"><ha-icon .icon=${metric.icon} aria-hidden="true"></ha-icon>${translate(language, metric.label)}</div>
-            <div class="metric-value">${value}</div>
-            ${adaptive ? html`<div class="metric-reason">${reason ? translate(language, reason) : ""}</div>` : ""}
-          </div>
+          <button type="button" class="metric sensor-reading" data-metric=${metric.key} data-emphasis=${reason ?? "none"}
+            @click=${() => showMoreInfo(metric.entityId)}>
+            <span class="label"><ha-icon .icon=${metric.icon} aria-hidden="true"></ha-icon>${translate(language, metric.label)}</span>
+            <span class="metric-value">${value}</span>
+            ${adaptive ? html`<span class="metric-reason">${reason ? translate(language, reason) : ""}</span>` : ""}
+          </button>
         `;
       })}
     </section>
