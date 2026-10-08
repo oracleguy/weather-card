@@ -210,8 +210,27 @@ test("responds to allocated width with full station metrics and independent fore
     await expect(card.locator(".metric")).toHaveCount(7);
     await expect(card.locator(".rainfall-metric")).toHaveCount(3);
     await expect(card.locator(".rainfall-plot path")).toHaveAttribute("d", /M0,74\.00 H10/);
+    expect(await card.evaluate((element) => {
+      const hourly = element.shadowRoot!.querySelector(".hourly")!;
+      const rainfall = element.shadowRoot!.querySelector(".rainfall")!;
+      return Boolean(hourly.compareDocumentPosition(rainfall) & Node.DOCUMENT_POSITION_FOLLOWING);
+    })).toBe(true);
     await expect(card.locator(".temperature")).toHaveText("18.5");
     await expect(card.locator(".forecast-value")).toHaveText("66");
+    const metricTypography = await card.evaluate((element) => ({
+      value: getComputedStyle(element.shadowRoot!.querySelector(".metric-value")!).fontSize,
+      stationLabel: getComputedStyle(element.shadowRoot!.querySelector(".metric .label")!).fontSize,
+      rainfallLabel: getComputedStyle(element.shadowRoot!.querySelector(".rainfall-metric .label")!).fontSize,
+      contentPadding: getComputedStyle(element.shadowRoot!.querySelector(".content")!).padding,
+      contentGap: getComputedStyle(element.shadowRoot!.querySelector(".content")!).rowGap,
+      sectionPadding: getComputedStyle(element.shadowRoot!.querySelector(".hourly")!).paddingTop,
+    }));
+    expect(metricTypography).toEqual({
+      value: "16px", stationLabel: "14px", rainfallLabel: "14px",
+      contentPadding: width >= 600 ? "14px" : "16px",
+      contentGap: width >= 600 ? "12px" : "16px",
+      sectionPadding: width >= 600 ? "12px" : "16px",
+    });
     const fits = await card.evaluate((element) => {
       const root = element.shadowRoot!;
       return [...root.querySelectorAll<HTMLElement>(".content, .metric, .temperature, .label, .hourly-period, .rainfall, .rainfall-metric, .rainfall-caption, .rainfall-status")]
@@ -229,6 +248,12 @@ test("responds to allocated width with full station metrics and independent fore
     }
     await card.screenshot({ path: testInfo.outputPath(`card-${width}.png`) });
   }
+  await card.evaluate(async (element: any) => {
+    element.setConfig({ ...element.config, show_hourly_forecast: false });
+    await element.updateComplete;
+  });
+  await expect(card.locator(".hourly")).toHaveCount(0);
+  await expect(card.locator(".rainfall")).toHaveCount(1);
 });
 
 test("fits mobile, formats locale values, and preserves partial unavailable configuration", async ({ page }, testInfo) => {

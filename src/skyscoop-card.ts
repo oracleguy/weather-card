@@ -155,8 +155,8 @@ export class SkyScoopCard extends LitElement {
     }
 
     .metric { min-width: 0; overflow-wrap: anywhere; }
-    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; line-height: 1.3; }
-    .metric-value { margin-top: 6px; font-size: 0.9375rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; line-height: 1.3; }
+    .metric-value { margin-top: 6px; font-size: 1rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
     .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
     .metric-reason { min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
     .metric[data-emphasis="strongWind"] .metric-value, .metric[data-emphasis="highUv"] .metric-value { font-weight: 700; }
@@ -170,7 +170,7 @@ export class SkyScoopCard extends LitElement {
     .rainfall[data-emphasis="heavy"] .rainfall-status { text-decoration: underline; text-underline-offset: 3px; }
     .rainfall-metrics { display: grid; grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr)); gap: 12px 16px; margin-top: 8px; }
     .rainfall-metric { min-width: 0; overflow-wrap: anywhere; }
-    .rainfall-metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.8125rem; }
+    .rainfall-metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; }
     .rainfall-history { min-width: 0; margin-top: 16px; }
     .rainfall-plot { display: block; width: 100%; height: 88px; margin-block: 8px; overflow: visible; }
     .rainfall-plot path { stroke: var(--skyscoop-accent); stroke-width: 2; }
@@ -189,6 +189,15 @@ export class SkyScoopCard extends LitElement {
     .hourly-probability { grid-row: 4; }
     .hourly-probability ha-icon { --mdc-icon-size: 14px; }
     .label { overflow-wrap: anywhere; }
+    @container (min-width: 600px) {
+      .content { gap: 12px; padding: 14px; }
+      .station-metrics { row-gap: 14px; }
+      .station-metrics, .rainfall, .hourly { padding-top: 12px; }
+      .hourly-strip { margin-top: 8px; padding-block: 6px; }
+      .rainfall-metrics { gap: 8px 12px; }
+      .rainfall-history { margin-top: 8px; }
+      .rainfall-plot, .rainfall-placeholder { height: 64px; margin-block: 4px; }
+    }
     @container (max-width: 359px) { .station-metrics, .rainfall-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @container (max-width: 359px) { .temperature-row.has-temperature.has-forecast { grid-template-columns: minmax(0, 1fr); } .forecast-summary { border-inline-start: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding: 12px 0 0; } }
     @container (max-width: 220px) { .station-metrics, .rainfall-metrics { grid-template-columns: minmax(0, 1fr); } .content { gap: 10px; padding: 12px; } .temperature-row { gap: 12px; } }
@@ -416,7 +425,6 @@ export class SkyScoopCard extends LitElement {
               : ""}
           </div>
           ${renderStationMetrics(metrics, language, layout, emphasis.metrics)}
-          ${renderRainfallSection(this.hass, this.config, this.rainfallHistory, emphasis, timeZone)}
           ${weatherEntityId && this.hourlyEnabled ? html`
             <section class="hourly" aria-label=${translate(language, "hourlyForecast")}>
               <div class="label">${translate(language, "hourlyForecast")}</div>
@@ -424,6 +432,7 @@ export class SkyScoopCard extends LitElement {
                 : html`<div class="message" role="status">${translate(language, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
             </section>
           ` : ""}
+          ${renderRainfallSection(this.hass, this.config, this.rainfallHistory, emphasis, timeZone)}
         </div>
       </ha-card>
     `;
