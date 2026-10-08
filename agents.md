@@ -175,7 +175,7 @@ Before a release, test at minimum with:
 
 ## Documentation expectations
 
-Keep the README current as configuration changes. Include screenshots or sample layouts when the UI stabilizes. Document optional entities, automatic behavior, localization, known limitations, and upgrade notes.
+Keep `readme.md` as a concise project entry point with availability, quick start, and links to detailed documentation. Put end-user configuration, behavior, localization, limitations, and troubleshooting in `docs/USER_GUIDE.md`; keep both aligned with the implementation. Include screenshots or sample layouts when the UI stabilizes, and document upgrade notes when configuration changes require them.
 
 ## Scope discipline
 
