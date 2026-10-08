@@ -37,6 +37,75 @@ describe("SkyScoop card", () => {
     expect(card.shadowRoot?.querySelector(".unit")?.textContent).toBe("°C");
   });
 
+  it("opens native More Info for the configured temperature, including unavailable readings", async () => {
+    const card = document.createElement(CARD_TAG) as SkyScoopCard;
+    card.setConfig({ temperature_entity: "sensor.outdoor_temperature" });
+    card.hass = { states: {} };
+    document.body.append(card);
+    await card.updateComplete;
+    const moreInfo = vi.fn();
+    document.addEventListener("hass-more-info", moreInfo);
+    try {
+      const button = card.shadowRoot?.querySelector<HTMLButtonElement>(".reading.sensor-reading");
+      expect(button?.type).toBe("button");
+      expect(button?.textContent).toContain("Unavailable");
+      button!.click();
+      expect(moreInfo).toHaveBeenCalledTimes(1);
+      const event = moreInfo.mock.calls[0][0] as CustomEvent;
+      expect(event.detail).toEqual({ entityId: "sensor.outdoor_temperature" });
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    } finally {
+      document.removeEventListener("hass-more-info", moreInfo);
+    }
+  });
+
+  it.each(["18.5", "unavailable", "unknown", undefined])("targets every configured sensor with state %s without making derived sections interactive", async (state) => {
+    const entities = {
+      temperature_entity: "sensor.outdoor", humidity_entity: "sensor.humidity", dew_point_entity: "sensor.dew",
+      wind_speed_entity: "sensor.wind", wind_gust_entity: "sensor.gust", wind_direction_entity: "sensor.direction",
+      uv_index_entity: "sensor.uv", illuminance_entity: "sensor.lux",
+      rainfall_rate_entity: "sensor.rate", rainfall_today_entity: "sensor.today", rainfall_week_entity: "sensor.week",
+    };
+    const card = document.createElement(CARD_TAG) as SkyScoopCard;
+    card.setConfig({ ...entities, weather_entity: "weather.home", rain_state_entity: "binary_sensor.rain" });
+    card.hass = { states: {
+      ...Object.fromEntries(state === undefined ? [] : Object.values(entities).map((entityId) => [entityId, { state, attributes: {} }])),
+      "weather.home": { state: "sunny", attributes: { supported_features: 2 } },
+    } };
+    document.body.append(card);
+    await card.updateComplete;
+    const moreInfo = vi.fn();
+    document.addEventListener("hass-more-info", moreInfo);
+    try {
+      expect(card.shadowRoot?.querySelectorAll("button.sensor-reading")).toHaveLength(11);
+      for (const [key, entityId] of Object.entries(entities)) {
+        const selector = key === "temperature_entity" ? ".reading.sensor-reading"
+          : key.startsWith("rainfall_") ? `[data-rainfall="${key}"]` : `[data-metric="${key}"]`;
+        const button = card.shadowRoot?.querySelector<HTMLButtonElement>(selector);
+        expect(button?.tagName).toBe("BUTTON");
+        expect(button?.disabled).toBe(false);
+        const calls = moreInfo.mock.calls.length;
+        button!.querySelector<HTMLElement>(".temperature, .metric-value")!.click();
+        expect(moreInfo).toHaveBeenCalledTimes(calls + 1);
+        expect((moreInfo.mock.calls.at(-1)![0] as CustomEvent).detail).toEqual({ entityId });
+      }
+      for (const selector of [".forecast-summary", ".hourly", ".rainfall-status", ".rainfall-history"]) {
+        const section = card.shadowRoot?.querySelector<HTMLElement>(selector);
+        expect(section).not.toBeNull();
+        section!.click();
+      }
+      expect(moreInfo).toHaveBeenCalledTimes(11);
+      card.setConfig({});
+      await card.updateComplete;
+      expect(card.shadowRoot?.querySelectorAll("button.sensor-reading")).toHaveLength(0);
+      card.shadowRoot?.querySelector<HTMLElement>(".message")?.click();
+      expect(moreInfo).toHaveBeenCalledTimes(11);
+    } finally {
+      document.removeEventListener("hass-more-info", moreInfo);
+    }
+  });
+
   it("uses a trimmed configured name as the card header", async () => {
     const card = document.createElement(CARD_TAG) as SkyScoopCard;
     card.setConfig({ name: " \t " });

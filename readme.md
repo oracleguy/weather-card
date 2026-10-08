@@ -140,6 +140,12 @@ Replace these example entity IDs with your own. All optional mappings can be con
 
 If the outdoor sensor is omitted, the card displays a setup prompt. Missing, empty, unknown, unavailable, or invalid sensor states display an unavailable reading. Unconfigured optional sensors are hidden; configured unavailable ones retain their labels.
 
+### Sensor interactions
+
+Tap or click the measured temperature, any station metric, or a rainfall rate/total to open Home Assistant's standard More Info dialog for its mapped entity. Keyboard users can Tab to a reading and activate it with Enter or Space. No additional configuration is required, and configured unavailable readings remain interactive.
+
+Home Assistant controls the dialog and its history; history availability depends on the entity and recorder settings. Forecasts, the derived rain status, and the rain-history chart remain display-only. The built-in dialog still needs live Home Assistant verification; automated tests check entity targeting, event propagation, touch and keyboard activation, focus visibility, and responsive layout in a mocked frontend.
+
 ### Forecast behavior
 
 The high/low summary uses daily or twice-daily forecasts, preferring twice-daily when advertised. Actual day/night period timestamps control the transition when available; otherwise it switches at 17:00 in Home Assistant's timezone. Hourly forecasts use the **same** weather entity with an independent `weather/subscribe_forecast` subscription when hourly support is advertised. Hourly-only providers work even without a daily summary.

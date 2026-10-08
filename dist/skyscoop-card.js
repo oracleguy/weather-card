@@ -58,23 +58,23 @@ var e = globalThis, t = e.ShadowRoot && (e.ShadyCSS === void 0 || e.ShadyCSS.nat
 		}
 		return n;
 	}
-}, ee = (e, t) => !l(e, t), x = {
+}, x = (e, t) => !l(e, t), S = {
 	attribute: !0,
 	type: String,
 	converter: b,
 	reflect: !1,
 	useDefault: !1,
-	hasChanged: ee
+	hasChanged: x
 };
 Symbol.metadata ??= Symbol("metadata"), h.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-var S = class extends HTMLElement {
+var C = class extends HTMLElement {
 	static addInitializer(e) {
 		this._$Ei(), (this.l ??= []).push(e);
 	}
 	static get observedAttributes() {
 		return this.finalize(), this._$Eh && [...this._$Eh.keys()];
 	}
-	static createProperty(e, t = x) {
+	static createProperty(e, t = S) {
 		if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
 			let n = Symbol(), r = this.getPropertyDescriptor(e, n, t);
 			r !== void 0 && u(this.prototype, e, r);
@@ -100,7 +100,7 @@ var S = class extends HTMLElement {
 		};
 	}
 	static getPropertyOptions(e) {
-		return this.elementProperties.get(e) ?? x;
+		return this.elementProperties.get(e) ?? S;
 	}
 	static _$Ei() {
 		if (this.hasOwnProperty(y("elementProperties"))) return;
@@ -187,7 +187,7 @@ var S = class extends HTMLElement {
 	requestUpdate(e, t, n, r = !1, i) {
 		if (e !== void 0) {
 			let a = this.constructor;
-			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? ee)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
+			if (!1 === r && (i = this[e]), n ??= a.getPropertyOptions(e), !((n.hasChanged ?? x)(i, t) || n.useDefault && n.reflect && i === this._$Ej?.get(e) && !this.hasAttribute(a._$Eu(e, n)))) return;
 			this.C(e, t, n);
 		}
 		!1 === this.isUpdatePending && (this._$ES = this._$EP());
@@ -251,17 +251,17 @@ var S = class extends HTMLElement {
 	updated(e) {}
 	firstUpdated(e) {}
 };
-S.elementStyles = [], S.shadowRootOptions = { mode: "open" }, S[y("elementProperties")] = /* @__PURE__ */ new Map(), S[y("finalized")] = /* @__PURE__ */ new Map(), v?.({ ReactiveElement: S }), (h.reactiveElementVersions ??= []).push("2.1.2");
+C.elementStyles = [], C.shadowRootOptions = { mode: "open" }, C[y("elementProperties")] = /* @__PURE__ */ new Map(), C[y("finalized")] = /* @__PURE__ */ new Map(), v?.({ ReactiveElement: C }), (h.reactiveElementVersions ??= []).push("2.1.2");
 //#endregion
 //#region node_modules/lit-html/lit-html.js
-var C = globalThis, te = (e) => e, w = C.trustedTypes, ne = w ? w.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, re = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, E = "?" + T, ie = `<${E}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, oe = /-->/g, se = />/g, N = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), ce = /'/g, P = /"/g, le = /^(?:script|style|textarea|title)$/i, F = ((e) => (t, ...n) => ({
+var w = globalThis, ee = (e) => e, T = w.trustedTypes, te = T ? T.createPolicy("lit-html", { createHTML: (e) => e }) : void 0, ne = "$lit$", E = `lit$${Math.random().toFixed(9).slice(2)}$`, re = "?" + E, ie = `<${re}>`, D = document, O = () => D.createComment(""), k = (e) => e === null || typeof e != "object" && typeof e != "function", A = Array.isArray, ae = (e) => A(e) || typeof e?.[Symbol.iterator] == "function", j = "[ 	\n\f\r]", M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, oe = /-->/g, se = />/g, N = RegExp(`>|${j}(?:([^\\s"'>=/]+)(${j}*=${j}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`, "g"), ce = /'/g, P = /"/g, le = /^(?:script|style|textarea|title)$/i, F = ((e) => (t, ...n) => ({
 	_$litType$: e,
 	strings: t,
 	values: n
 }))(1), I = Symbol.for("lit-noChange"), L = Symbol.for("lit-nothing"), ue = /* @__PURE__ */ new WeakMap(), R = D.createTreeWalker(D, 129);
 function de(e, t) {
 	if (!A(e) || !e.hasOwnProperty("raw")) throw Error("invalid template strings array");
-	return ne === void 0 ? t : ne.createHTML(t);
+	return te === void 0 ? t : te.createHTML(t);
 }
 var fe = (e, t) => {
 	let n = e.length - 1, r = [], i, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = M;
@@ -269,7 +269,7 @@ var fe = (e, t) => {
 		let n = e[t], s, c, l = -1, u = 0;
 		for (; u < n.length && (o.lastIndex = u, c = o.exec(n), c !== null);) u = o.lastIndex, o === M ? c[1] === "!--" ? o = oe : c[1] === void 0 ? c[2] === void 0 ? c[3] !== void 0 && (o = N) : (le.test(c[2]) && (i = RegExp("</" + c[2], "g")), o = N) : o = se : o === N ? c[0] === ">" ? (o = i ?? M, l = -1) : c[1] === void 0 ? l = -2 : (l = o.lastIndex - c[2].length, s = c[1], o = c[3] === void 0 ? N : c[3] === "\"" ? P : ce) : o === P || o === ce ? o = N : o === oe || o === se ? o = M : (o = N, i = void 0);
 		let d = o === N && e[t + 1].startsWith("/>") ? " " : "";
-		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + re + n.slice(l) + T + d) : n + T + (l === -2 ? t : d);
+		a += o === M ? n + ie : l >= 0 ? (r.push(s), n.slice(0, l) + ne + n.slice(l) + E + d) : n + E + (l === -2 ? t : d);
 	}
 	return [de(e, a + (e[n] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), r];
 }, z = class e {
@@ -283,8 +283,8 @@ var fe = (e, t) => {
 		}
 		for (; (i = R.nextNode()) !== null && c.length < s;) {
 			if (i.nodeType === 1) {
-				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(re)) {
-					let t = u[o++], n = i.getAttribute(e).split(T), r = /([.?@])?(.*)/.exec(t);
+				if (i.hasAttributes()) for (let e of i.getAttributeNames()) if (e.endsWith(ne)) {
+					let t = u[o++], n = i.getAttribute(e).split(E), r = /([.?@])?(.*)/.exec(t);
 					c.push({
 						type: 1,
 						index: a,
@@ -292,14 +292,14 @@ var fe = (e, t) => {
 						strings: n,
 						ctor: r[1] === "." ? me : r[1] === "?" ? he : r[1] === "@" ? ge : H
 					}), i.removeAttribute(e);
-				} else e.startsWith(T) && (c.push({
+				} else e.startsWith(E) && (c.push({
 					type: 6,
 					index: a
 				}), i.removeAttribute(e));
 				if (le.test(i.tagName)) {
-					let e = i.textContent.split(T), t = e.length - 1;
+					let e = i.textContent.split(E), t = e.length - 1;
 					if (t > 0) {
-						i.textContent = w ? w.emptyScript : "";
+						i.textContent = T ? T.emptyScript : "";
 						for (let n = 0; n < t; n++) i.append(e[n], O()), R.nextNode(), c.push({
 							type: 2,
 							index: ++a
@@ -308,16 +308,16 @@ var fe = (e, t) => {
 					}
 				}
 			} else if (i.nodeType === 8) {
-				if (i.data === E) c.push({
+				if (i.data === re) c.push({
 					type: 2,
 					index: a
 				});
 				else {
 					let e = -1;
-					for (; (e = i.data.indexOf(T, e + 1)) !== -1;) c.push({
+					for (; (e = i.data.indexOf(E, e + 1)) !== -1;) c.push({
 						type: 7,
 						index: a
-					}), e += T.length - 1;
+					}), e += E.length - 1;
 				}
 			}
 			a++;
@@ -409,8 +409,8 @@ var pe = class {
 	}
 	_$AR(e = this._$AA.nextSibling, t) {
 		for (this._$AP?.(!1, !0, t); e !== this._$AB;) {
-			let t = te(e).nextSibling;
-			te(e).remove(), e = t;
+			let t = ee(e).nextSibling;
+			ee(e).remove(), e = t;
 		}
 	}
 	setConnected(e) {
@@ -474,8 +474,8 @@ var pe = class {
 	_$AI(e) {
 		B(this, e);
 	}
-}, ve = C.litHtmlPolyfillSupport;
-ve?.(z, V), (C.litHtmlVersions ??= []).push("3.3.3");
+}, ve = w.litHtmlPolyfillSupport;
+ve?.(z, V), (w.litHtmlVersions ??= []).push("3.3.3");
 var ye = (e, t, n) => {
 	let r = n?.renderBefore ?? t, i = r._$litPart$;
 	if (i === void 0) {
@@ -483,7 +483,7 @@ var ye = (e, t, n) => {
 		r._$litPart$ = i = new V(t.insertBefore(O(), e), e, void 0, n ?? {});
 	}
 	return i._$AI(e), i;
-}, U = globalThis, W = class extends S {
+}, U = globalThis, W = class extends C {
 	constructor() {
 		super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
 	}
@@ -575,12 +575,14 @@ function K(e, t) {
 }
 function q(e, t) {
 	return xe.flatMap((n) => {
-		if (!t?.[n.key]) return [];
-		let r = K(e, t[n.key]), i = r.value !== void 0 && r.value >= n.minimum && r.value <= n.maximum ? r.value : void 0;
+		let r = t?.[n.key];
+		if (!r) return [];
+		let i = K(e, r), a = i.value !== void 0 && i.value >= n.minimum && i.value <= n.maximum ? i.value : void 0;
 		return [{
 			...n,
-			...r,
-			value: i
+			...i,
+			value: a,
+			entityId: r
 		}];
 	});
 }
@@ -776,19 +778,20 @@ function ke(e, t = 16) {
 }
 //#endregion
 //#region src/station-metrics.ts
-function Ae(e, t, n, r = {}) {
+function Ae(e, t, n, r, i = {}) {
 	if (!e.length) return "";
-	let i = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
+	let a = new Intl.NumberFormat(t || "en", { maximumFractionDigits: 1 });
 	return F`
     <section class="station-metrics" aria-label=${Y(t, "stationMetrics")}>
       ${e.map((e) => {
-		let a = e.key === "wind_direction_entity" && e.value !== void 0 ? ke(e.value, n === "compact" ? 8 : 16) : void 0, o = e.value === void 0 ? Y(t, "unavailable") : a ? `${Y(t, a)} (${i.format(Oe(e.value))}°)` : `${i.format(e.value)} ${e.unit}`, s = r[e.key], c = e.key.startsWith("wind_") || e.key === "uv_index_entity";
+		let o = e.key === "wind_direction_entity" && e.value !== void 0 ? ke(e.value, n === "compact" ? 8 : 16) : void 0, s = e.value === void 0 ? Y(t, "unavailable") : o ? `${Y(t, o)} (${a.format(Oe(e.value))}°)` : `${a.format(e.value)} ${e.unit}`, c = i[e.key], l = e.key.startsWith("wind_") || e.key === "uv_index_entity";
 		return F`
-          <div class="metric" data-metric=${e.key} data-emphasis=${s ?? "none"}>
-            <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(t, e.label)}</div>
-            <div class="metric-value">${o}</div>
-            ${c ? F`<div class="metric-reason">${s ? Y(t, s) : ""}</div>` : ""}
-          </div>
+          <button type="button" class="metric sensor-reading" data-metric=${e.key} data-emphasis=${c ?? "none"}
+            @click=${() => r(e.entityId)}>
+            <span class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(t, e.label)}</span>
+            <span class="metric-value">${s}</span>
+            ${l ? F`<span class="metric-reason">${c ? Y(t, c) : ""}</span>` : ""}
+          </button>
         `;
 	})}
     </section>
@@ -1026,48 +1029,49 @@ function Ue(e, t) {
 }
 //#endregion
 //#region src/rainfall-section.ts
-function We(e, t, n, r, i) {
-	let a = Ie(e, t);
-	if (!a.length && !t?.rain_state_entity) return "";
-	let o = e?.language, s = new Intl.NumberFormat(o || "en", { maximumFractionDigits: 2 }), c = new Intl.DateTimeFormat(o || "en", {
+function We(e, t, n, r, i, a) {
+	let o = Ie(e, t);
+	if (!o.length && !t?.rain_state_entity) return "";
+	let s = e?.language, c = new Intl.NumberFormat(s || "en", { maximumFractionDigits: 2 }), l = new Intl.DateTimeFormat(s || "en", {
 		timeZone: i,
 		month: "short",
 		day: "numeric",
 		hour: "numeric",
 		minute: "2-digit",
 		timeZoneName: "short"
-	}), l = K(e, t?.rainfall_rate_entity).unit, u = n.status === "error" && n.fetchedAt !== void 0, d = u ? Date.now() : n.fetchedAt ?? Date.now(), f = Re(n.records, d, l, n.fetchedAt ?? d), p = f.flatMap((e) => e.peak === void 0 ? [] : [e.peak]), m = p.length ? Math.max(...p) : void 0, h = Math.max(m ?? 0, 1), g = f.map((e, t) => {
+	}), u = K(e, t?.rainfall_rate_entity).unit, d = n.status === "error" && n.fetchedAt !== void 0, f = d ? Date.now() : n.fetchedAt ?? Date.now(), p = Re(n.records, f, u, n.fetchedAt ?? f), m = p.flatMap((e) => e.peak === void 0 ? [] : [e.peak]), h = m.length ? Math.max(...m) : void 0, g = Math.max(h ?? 0, 1), _ = p.map((e, t) => {
 		if (e.peak === void 0) return "";
-		let n = (74 - e.peak / h * 64).toFixed(2);
-		return `${t && f[t - 1].peak !== void 0 ? "L" : "M"}${t * 10},${n} H${(t + 1) * 10}`;
-	}).join(" "), _ = m === void 0 ? "" : `${Y(o, "peakRate")}: ${s.format(m)} ${l}`, v = `${c.format(d - 24 * Q)} - ${c.format(d)}`, y = r.heavyRain ? "heavyRain" : r.rain, b = n.status === "loading" || n.status === "idle" ? "rainfallHistoryLoading" : n.status === "error" ? "rainfallHistoryError" : "rainfallHistoryEmpty";
+		let n = (74 - e.peak / g * 64).toFixed(2);
+		return `${t && p[t - 1].peak !== void 0 ? "L" : "M"}${t * 10},${n} H${(t + 1) * 10}`;
+	}).join(" "), v = h === void 0 ? "" : `${Y(s, "peakRate")}: ${c.format(h)} ${u}`, y = `${l.format(f - 24 * Q)} - ${l.format(f)}`, b = r.heavyRain ? "heavyRain" : r.rain, x = n.status === "loading" || n.status === "idle" ? "rainfallHistoryLoading" : n.status === "error" ? "rainfallHistoryError" : "rainfallHistoryEmpty";
 	return F`
-    <section class="rainfall" data-emphasis=${r.rainfall} aria-label=${Y(o, "rainfall")}>
+    <section class="rainfall" data-emphasis=${r.rainfall} aria-label=${Y(s, "rainfall")}>
       <div class="rainfall-heading">
-        <div class="label">${Y(o, "rainfall")}</div>
-        <div class="rainfall-status"><ha-icon icon="mdi:weather-pouring" aria-hidden="true"></ha-icon>${Y(o, y)}</div>
+        <div class="label">${Y(s, "rainfall")}</div>
+        <div class="rainfall-status"><ha-icon icon="mdi:weather-pouring" aria-hidden="true"></ha-icon>${Y(s, b)}</div>
       </div>
-      ${a.length ? F`
+      ${o.length ? F`
         <div class="rainfall-metrics">
-          ${a.map((e) => F`
-            <div class="rainfall-metric" data-rainfall=${e.key}>
-              <div class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(o, e.label)}</div>
-              <div class="metric-value">${e.value === void 0 ? Y(o, "unavailable") : `${s.format(e.value)} ${e.unit}`}</div>
-            </div>
+          ${o.map((e) => F`
+            <button type="button" class="rainfall-metric sensor-reading" data-rainfall=${e.key}
+              @click=${() => a(t?.[e.key] ?? "")}>
+              <span class="label"><ha-icon .icon=${e.icon} aria-hidden="true"></ha-icon>${Y(s, e.label)}</span>
+              <span class="metric-value">${e.value === void 0 ? Y(s, "unavailable") : `${c.format(e.value)} ${e.unit}`}</span>
+            </button>
           `)}
         </div>
       ` : ""}
       ${t?.rainfall_rate_entity && t.show_rainfall_history !== !1 ? F`
         <div class="rainfall-history">
-          <div class="label">${Y(o, "rainfallHistory")}</div>
-          ${m === void 0 ? F`<div class="rainfall-placeholder" role="status">${Y(o, b)}</div>` : F`
+          <div class="label">${Y(s, "rainfallHistory")}</div>
+          ${h === void 0 ? F`<div class="rainfall-placeholder" role="status">${Y(s, x)}</div>` : F`
             <svg class="rainfall-plot" viewBox="0 0 240 80" preserveAspectRatio="none" role="img"
-              aria-label=${`${Y(o, "rainfallHistory")}. ${v}. ${_}`}>
-              <path d=${g} fill="none" vector-effect="non-scaling-stroke"></path>
+              aria-label=${`${Y(s, "rainfallHistory")}. ${y}. ${v}`}>
+              <path d=${_} fill="none" vector-effect="non-scaling-stroke"></path>
             </svg>
           `}
-          <div class="rainfall-caption"><span>${_}</span><span>${v}</span></div>
-          <div class="rainfall-history-status" role="status">${u ? `${Y(o, "rainfallHistoryStale")} ${c.format(n.fetchedAt)}` : ""}</div>
+          <div class="rainfall-caption"><span>${v}</span><span>${y}</span></div>
+          <div class="rainfall-history-status" role="status">${d ? `${Y(s, "rainfallHistoryStale")} ${l.format(n.fetchedAt)}` : ""}</div>
         </div>
       ` : ""}
     </section>
@@ -1093,7 +1097,13 @@ var $ = "skyscoop-card", Ge = {
 	exceptional: "storm"
 }, Ke = class extends W {
 	constructor(...e) {
-		super(...e), this.summaryStream = new je(() => this.requestUpdate()), this.hourlyStream = new je(() => this.requestUpdate()), this.rainfallHistory = new ze(() => this.requestUpdate()), this.widthLayout = "standard";
+		super(...e), this.summaryStream = new je(() => this.requestUpdate()), this.hourlyStream = new je(() => this.requestUpdate()), this.rainfallHistory = new ze(() => this.requestUpdate()), this.widthLayout = "standard", this.showMoreInfo = (e) => {
+			e && this.dispatchEvent(new CustomEvent("hass-more-info", {
+				detail: { entityId: e },
+				bubbles: !0,
+				composed: !0
+			}));
+		};
 	}
 	static {
 		this.properties = {
@@ -1144,6 +1154,25 @@ var $ = "skyscoop-card", Ge = {
     }
 
     .reading { min-width: 0; }
+
+    .sensor-reading {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      appearance: none;
+      border: 0;
+      border-radius: 4px;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: start;
+      align-content: start;
+      cursor: pointer;
+    }
+
+    .sensor-reading:hover { background: var(--secondary-background-color, rgba(127, 127, 127, 0.08)); }
+    .sensor-reading:focus-visible { outline: 2px solid var(--skyscoop-accent); outline-offset: 4px; }
 
     .summary-label {
       display: flex;
@@ -1230,9 +1259,9 @@ var $ = "skyscoop-card", Ge = {
 
     .metric { min-width: 0; overflow-wrap: anywhere; }
     .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; line-height: 1.3; }
-    .metric-value { margin-top: 6px; font-size: 1rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .metric-value { display: block; margin-top: 6px; font-size: 1rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
     .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
-    .metric-reason { min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
+    .metric-reason { display: block; min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
     .metric[data-emphasis="strongWind"] .metric-value, .metric[data-emphasis="highUv"] .metric-value { font-weight: 700; }
     .metric[data-emphasis="strongWind"] ha-icon, .metric[data-emphasis="highUv"] ha-icon { color: var(--skyscoop-accent); }
     .rainfall { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
@@ -1352,20 +1381,20 @@ var $ = "skyscoop-card", Ge = {
         <div class="content">
           <div class="temperature-row ${t ? "has-temperature" : ""} ${o ? "has-forecast" : ""}">
             ${t ? F`
-                  <div class="reading">
-                    <div class="label summary-label">
+                  <button type="button" class="reading sensor-reading" @click=${() => this.showMoreInfo(t)}>
+                    <span class="label summary-label">
                       <span class="summary-icon current-condition-icon">
                         <ha-icon icon=${v} role="img" aria-label=${Y(e, _ ?? "temperature")}></ha-icon>
                       </span>
                       <span>${Y(e, "temperature")}</span>
-                    </div>
-                    <div class="value-line">
-                      <div class="temperature" aria-label=${Y(e, "temperature")}>
+                    </span>
+                    <span class="value-line">
+                      <span class="temperature" aria-label=${Y(e, "temperature")}>
                         ${i ? new Intl.NumberFormat(e || "en", { maximumFractionDigits: 1 }).format(r) : Y(e, "unavailable")}
-                      </div>
-                      ${a ? F`<div class="unit">${a}</div>` : ""}
-                    </div>
-                  </div>
+                      </span>
+                      ${a ? F`<span class="unit">${a}</span>` : ""}
+                    </span>
+                  </button>
                 ` : F`<div class="message">${Y(e, "chooseTemperature")}</div>`}
             ${o ? F`
                   <div class="reading forecast-summary">
@@ -1384,14 +1413,14 @@ var $ = "skyscoop-card", Ge = {
                   </div>
                 ` : ""}
           </div>
-          ${Ae(f, e, d, p.metrics)}
+          ${Ae(f, e, d, this.showMoreInfo, p.metrics)}
           ${o && this.hourlyEnabled ? F`
             <section class="hourly" aria-label=${Y(e, "hourlyForecast")}>
               <div class="label">${Y(e, "hourlyForecast")}</div>
               ${m.length ? Pe(m, e, c, h) : F`<div class="message" role="status">${Y(e, this.hourlyStream.status === "loading" ? "hourlyLoading" : "forecastUnavailable")}</div>`}
             </section>
           ` : ""}
-          ${We(this.hass, this.config, this.rainfallHistory, p, c)}
+          ${We(this.hass, this.config, this.rainfallHistory, p, c, this.showMoreInfo)}
         </div>
       </ha-card>
     `;

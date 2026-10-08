@@ -12,6 +12,7 @@ export function renderRainfallSection(
   history: RainfallHistory,
   emphasis: ReturnType<typeof metricEmphasis>,
   timeZone: string,
+  showMoreInfo: (entityId: string) => void,
 ) {
   const metrics = configuredRainfall(hass, config);
   if (!metrics.length && !config?.rain_state_entity) return "";
@@ -45,10 +46,11 @@ export function renderRainfallSection(
       ${metrics.length ? html`
         <div class="rainfall-metrics">
           ${metrics.map((metric) => html`
-            <div class="rainfall-metric" data-rainfall=${metric.key}>
-              <div class="label"><ha-icon .icon=${metric.icon} aria-hidden="true"></ha-icon>${translate(language, metric.label)}</div>
-              <div class="metric-value">${metric.value === undefined ? translate(language, "unavailable") : `${number.format(metric.value)} ${metric.unit}`}</div>
-            </div>
+            <button type="button" class="rainfall-metric sensor-reading" data-rainfall=${metric.key}
+              @click=${() => showMoreInfo(config?.[metric.key] ?? "")}>
+              <span class="label"><ha-icon .icon=${metric.icon} aria-hidden="true"></ha-icon>${translate(language, metric.label)}</span>
+              <span class="metric-value">${metric.value === undefined ? translate(language, "unavailable") : `${number.format(metric.value)} ${metric.unit}`}</span>
+            </button>
           `)}
         </div>
       ` : ""}

@@ -18,6 +18,7 @@ describe("station readings", () => {
     } }, { humidity_entity: "sensor.humidity", dew_point_entity: "sensor.dew", wind_gust_entity: "sensor.missing" });
     expect(metrics).toHaveLength(3);
     expect(metrics.map((metric) => metric.value)).toEqual([undefined, -5, undefined]);
+    expect(metrics.map((metric) => metric.entityId)).toEqual(["sensor.humidity", "sensor.dew", "sensor.missing"]);
     expect(metrics[1].unit).toBe("°C");
   });
 });

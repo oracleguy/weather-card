@@ -29,10 +29,11 @@ export function stationReading(hass: HassLike | undefined, entityId: string | un
 
 export function configuredMetrics(hass: HassLike | undefined, config: SkyScoopConfig | undefined) {
   return stationMetrics.flatMap((metric) => {
-    if (!config?.[metric.key]) return [];
-    const reading = stationReading(hass, config[metric.key]);
+    const entityId = config?.[metric.key];
+    if (!entityId) return [];
+    const reading = stationReading(hass, entityId);
     const value = reading.value !== undefined && reading.value >= metric.minimum && reading.value <= metric.maximum
       ? reading.value : undefined;
-    return [{ ...metric, ...reading, value }];
+    return [{ ...metric, ...reading, value, entityId }];
   });
 }

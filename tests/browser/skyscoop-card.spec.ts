@@ -106,6 +106,78 @@ test("loads the built bundle and renders a station temperature", async ({ page }
   expect(result.registered).toBe(true);
 });
 
+test("sensor readings expose native More Info with mouse, keyboard and visible focus", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1100, height: 1500 });
+  await mountCompleteCard(page, 280);
+  await page.evaluate(() => {
+    (window as any).skyscoopMoreInfoEvents = [];
+    document.addEventListener("hass-more-info", (event) => {
+      const moreInfo = event as CustomEvent;
+      (window as any).skyscoopMoreInfoEvents.push({
+        entityId: moreInfo.detail.entityId, bubbles: moreInfo.bubbles, composed: moreInfo.composed,
+      });
+    });
+  });
+  const card = page.locator("skyscoop-card");
+  const buttons = card.locator("button.sensor-reading");
+  const entityIds = ["sensor.outdoor", "sensor.humidity", "sensor.dew", "sensor.wind", "sensor.gust",
+    "sensor.direction", "sensor.uv", "sensor.lux", "sensor.rate", "sensor.today", "sensor.week"];
+  await expect(buttons).toHaveCount(entityIds.length);
+  const expected: { entityId: string; bubbles: boolean; composed: boolean }[] = [];
+  const events = () => page.evaluate(() => (window as any).skyscoopMoreInfoEvents);
+  for (const width of [280, 600, 900]) {
+    await card.evaluate((element, width) => { element.style.width = `${width}px`; }, width);
+    await expect(card.locator("ha-card")).toHaveAttribute("data-layout", width < 360 ? "compact" : "wide");
+    for (const [index, entityId] of entityIds.entries()) {
+      const button = buttons.nth(index);
+      await button.click();
+      expected.push({ entityId, bubbles: true, composed: true });
+      expect(await events()).toEqual(expected);
+      await button.focus();
+      await expect(button).toBeFocused();
+      await button.press("Enter");
+      expected.push({ entityId, bubbles: true, composed: true });
+      expect(await events()).toEqual(expected);
+      await button.press("Space");
+      expected.push({ entityId, bubbles: true, composed: true });
+      expect(await events()).toEqual(expected);
+    }
+    await buttons.first().focus();
+    await page.keyboard.press("Tab");
+    await expect(buttons.nth(1)).toBeFocused();
+    expect(await buttons.nth(1).evaluate((element) => {
+      const style = getComputedStyle(element);
+      return element.matches(":focus-visible") && style.outlineStyle === "solid" && style.outlineWidth === "2px";
+    })).toBe(true);
+    await card.screenshot({ path: testInfo.outputPath(`sensor-focus-${width}.png`) });
+    await card.locator(".forecast-summary").click();
+    await card.locator(".hourly-period").first().click();
+    await card.locator(".rainfall-status").click();
+    await card.locator(".rainfall-plot").click();
+    expect(await events()).toEqual(expected);
+  }
+});
+
+test.describe("touch sensor readings", () => {
+  test.use({ hasTouch: true, viewport: { width: 320, height: 1500 } });
+
+  test("taps open native More Info, including unavailable rainfall readings", async ({ page }) => {
+    await mountCompleteCard(page, 280);
+    await page.evaluate(() => {
+      (window as any).skyscoopMoreInfoEntities = [];
+      document.addEventListener("hass-more-info", (event) => {
+        (window as any).skyscoopMoreInfoEntities.push((event as CustomEvent).detail.entityId);
+      });
+    });
+    const card = page.locator("skyscoop-card");
+    await card.locator(".reading.sensor-reading").tap();
+    await card.locator("[data-metric=humidity_entity]").tap();
+    await card.locator("[data-rainfall=rainfall_week_entity]").tap();
+    expect(await page.evaluate(() => (window as any).skyscoopMoreInfoEntities))
+      .toEqual(["sensor.outdoor", "sensor.humidity", "sensor.week"]);
+  });
+});
+
 test("the built bundle subscribes to and renders a separate forecast summary", async ({ page }) => {
   const result = await page.evaluate(async () => {
     const now = new Date();
