@@ -45,6 +45,34 @@ describe("measured-condition emphasis", () => {
     expect(hass.states["sensor.rate"].attributes.unit_of_measurement).toBe("in/h");
   });
 
+  it("uses today's total at 5.08 mm or 0.2 inches for heavy-rain emphasis while rain is observed", () => {
+    const hass = observations("0");
+    hass.states["sensor.rate"].state = "0";
+    const totalConfig = { ...config, rainfall_today_entity: "sensor.today" };
+    hass.states["sensor.today"] = { state: "5.08", attributes: { unit_of_measurement: "mm" } };
+    expect(metricEmphasis(hass, totalConfig).heavyRain).toBe(true);
+
+    hass.states["sensor.today"] = { state: "0.2", attributes: { unit_of_measurement: "in" } };
+    expect(metricEmphasis(hass, totalConfig).heavyRain).toBe(true);
+
+    hass.states["sensor.today"].state = "5.079";
+    hass.states["sensor.today"].attributes.unit_of_measurement = "mm";
+    expect(metricEmphasis(hass, totalConfig).heavyRain).toBe(false);
+  });
+
+  it("requires observed wet status and a recognized unit for today's heavy-rain total", () => {
+    const hass = observations("0");
+    hass.states["sensor.rate"].state = "0";
+    const totalConfig = { ...config, rainfall_today_entity: "sensor.today" };
+    hass.states["sensor.today"] = { state: "0.2", attributes: { unit_of_measurement: "in" } };
+    hass.states["binary_sensor.rain"].state = "off";
+    expect(metricEmphasis(hass, totalConfig).heavyRain).toBe(false);
+
+    hass.states["binary_sensor.rain"].state = "on";
+    hass.states["sensor.today"].attributes.unit_of_measurement = "unknown";
+    expect(metricEmphasis(hass, totalConfig).heavyRain).toBe(false);
+  });
+
   it("skips unknown units and readings but respects binary rain-state conflicts", () => {
     const hass = observations("1000", "unknown");
     hass.states["sensor.rate"].attributes.unit_of_measurement = "unknown";

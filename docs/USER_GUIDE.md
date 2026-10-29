@@ -114,9 +114,9 @@ Failed refreshes retain usable previous history, marked stale with its last-load
 
 ## Adaptive emphasis
 
-Adaptive emphasis leaves readings in their existing order and never hides them. Observed active rain strengthens the rain status. Heavy rain adds a text cue at a measured rate of at least 7.5 mm/h and requires observed wet status. Wind speed or gust at 8 m/s or higher receives a strong-wind cue. UV index 6 or higher receives a high-UV cue. These are presentation thresholds, not safety alerts, and signals can appear together.
+Adaptive emphasis leaves readings in their existing order and never hides them. Observed active rain strengthens the rain status. Heavy rain adds a text cue when the measured rate is at least 7.5 mm/h or the configured rain-today total is at least 5.08 mm (0.2 in); both require observed wet status. Wind speed or gust at 8 m/s or higher receives a strong-wind cue. UV index 6 or higher receives a high-UV cue. These are presentation thresholds, not safety alerts, and signals can appear together.
 
-Threshold comparisons recognize wind units `m/s`, `km/h`, `mph`, `kn`, and `knots`, and rain-rate units `mm/h` and `in/h`. The card normalizes recognized units for comparison without converting displayed values. Unknown units disable magnitude-based emphasis, not the reading or positive-rate rain detection. Set `adaptive_metrics: false` to remove emphasis; measured wet/dry/heavy-rain status, totals, history, and forecasts remain available. Heat, humidity, fog, and daylight rules are not implemented.
+Threshold comparisons recognize wind units `m/s`, `km/h`, `mph`, `kn`, and `knots`, rain-rate units `mm/h` and `in/h`, and rain-total units `mm` and `in`. The card normalizes recognized units for comparison without converting displayed values. Unknown units disable magnitude-based emphasis, not the reading or positive-rate rain detection. Set `adaptive_metrics: false` to remove emphasis; measured wet/dry/heavy-rain status, totals, history, and forecasts remain available. Heat, humidity, fog, and daylight rules are not implemented.
 
 ## Sensor interactions
 

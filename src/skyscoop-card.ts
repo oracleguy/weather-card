@@ -130,7 +130,7 @@ export class SkyScoopCard extends LitElement {
 
     .label {
       color: var(--skyscoop-muted);
-      font-size: 0.875rem;
+      font-size: 0.91rem;
     }
 
     .temperature {
@@ -167,20 +167,20 @@ export class SkyScoopCard extends LitElement {
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(var(--metric-columns, 2), minmax(0, 1fr));
-      column-gap: 16px;
-      row-gap: 20px;
+      column-gap: 8px;
+      row-gap: 5px;
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
       padding-top: 16px;
     }
 
     .metric { min-width: 0; overflow-wrap: anywhere; }
-    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; line-height: 1.3; }
-    .metric-value { display: block; margin-top: 6px; font-size: 1rem; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; }
+    .metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.91rem; line-height: 1.3; }
+    .metric-value { display: block; margin-top: 6px; font-size: 1.1rem; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
     .metric ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); }
     .metric-reason { display: block; min-height: 1.1rem; font-size: 0.75rem; line-height: 1.1rem; color: var(--skyscoop-muted); }
     .metric[data-emphasis="strongWind"] .metric-value, .metric[data-emphasis="highUv"] .metric-value { font-weight: 700; }
     .metric[data-emphasis="strongWind"] ha-icon, .metric[data-emphasis="highUv"] ha-icon { color: var(--skyscoop-accent); }
-    .rainfall { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 16px; }
+    .rainfall { grid-column: 1 / -1; min-width: 0; border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2)); padding-top: 2px; }
     .rainfall-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: center; gap: 8px; min-height: 2.5rem; }
     .rainfall-status { display: flex; justify-content: end; align-items: center; gap: 6px; font-size: 0.8125rem; overflow-wrap: anywhere; }
     .rainfall ha-icon { --mdc-icon-size: 18px; color: var(--skyscoop-muted); flex-shrink: 0; }
@@ -191,7 +191,7 @@ export class SkyScoopCard extends LitElement {
     .rainfall-metric { min-width: 0; overflow-wrap: anywhere; }
     .rainfall-metric .label { display: flex; align-items: center; gap: 4px; font-size: 0.875rem; }
     .rainfall-history { min-width: 0; margin-top: 16px; }
-    .rainfall-plot { display: block; width: 100%; height: 88px; margin-block: 8px; overflow: visible; }
+    .rainfall-plot { display: block; width: 100%; height: 58px; margin-block: 4px; overflow: visible; }
     .rainfall-plot path { stroke: var(--skyscoop-accent); stroke-width: 2; }
     .rainfall-placeholder { display: grid; align-items: center; height: 88px; margin-block: 8px; color: var(--skyscoop-muted); font-size: 0.8125rem; }
     .rainfall-caption { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-height: 2.75rem; font-size: 0.75rem; color: var(--skyscoop-muted); overflow-wrap: anywhere; }
