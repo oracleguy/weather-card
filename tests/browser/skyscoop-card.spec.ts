@@ -298,7 +298,7 @@ test("responds to allocated width with full station metrics and independent fore
       sectionPadding: getComputedStyle(element.shadowRoot!.querySelector(".hourly")!).paddingTop,
     }));
     expect(metricTypography).toEqual({
-      value: "16px", stationLabel: "14px", rainfallLabel: "14px",
+      value: "17.6px", stationLabel: "14.56px", rainfallLabel: "14px",
       contentPadding: width >= 600 ? "14px" : "16px",
       contentGap: width >= 600 ? "12px" : "16px",
       sectionPadding: width >= 600 ? "12px" : "16px",
