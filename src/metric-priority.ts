@@ -6,6 +6,7 @@ export type MetricEmphasis = Partial<Record<StationEntityKey, "strongWind" | "hi
 
 const windFactors: Record<string, number> = { "m/s": 1, "km/h": 1 / 3.6, mph: 0.44704, kn: 0.5144444444444445, knots: 0.5144444444444445 };
 const rainFactors: Record<string, number> = { "mm/h": 1, "in/h": 25.4 };
+const rainfallTotalFactors: Record<string, number> = { mm: 1, in: 25.4 };
 
 function reaches(reading: ReturnType<typeof stationReading>, threshold: number, factors: Record<string, number>): boolean {
   const factor = Object.hasOwn(factors, reading.unit) ? factors[reading.unit] : undefined;
@@ -15,7 +16,10 @@ function reaches(reading: ReturnType<typeof stationReading>, threshold: number, 
 export function metricEmphasis(hass: HassLike | undefined, config: SkyScoopConfig | undefined) {
   const metrics: MetricEmphasis = {};
   const rain = observedRain(hass, config);
-  const heavyRain = rain === "wet" && reaches(stationReading(hass, config?.rainfall_rate_entity), 7.5, rainFactors);
+  const heavyRain = rain === "wet" && (
+    reaches(stationReading(hass, config?.rainfall_rate_entity), 7.5, rainFactors)
+    || reaches(stationReading(hass, config?.rainfall_today_entity), 5.08, rainfallTotalFactors)
+  );
   if (config?.adaptive_metrics === false) return { metrics, rain, heavyRain, rainfall: "none" as const };
   const wind = [config?.wind_speed_entity, config?.wind_gust_entity]
     .some((entityId) => reaches(stationReading(hass, entityId), 8, windFactors));
